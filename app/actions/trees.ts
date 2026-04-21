@@ -62,15 +62,37 @@ export async function listMyTrees(): Promise<TreeListItem[]> {
  * `bootstrap_tree` RPC (plan 01-02). Returns the new tree_id so the caller
  * can router.push(`/tree/${newId}`).
  *
- * Default name is `Untitled tree` — the topbar's TreeSwitcher does NOT pass a
- * name; the user renames inline after navigation.
+ * If the caller passes no name, the server picks a unique placeholder
+ * ("Untitled tree", "Untitled tree 2", "Untitled tree 3", …) by counting
+ * existing owned trees whose name matches that pattern. This keeps the tree
+ * switcher dropdown readable before the user renames inline.
  */
-export async function createNewTree(name = 'Untitled tree'): Promise<string> {
+export async function createNewTree(name?: string): Promise<string> {
   const userId = await getUserIdOrThrow();
   const supabase = await supabaseServer();
+
+  let resolvedName = name?.trim();
+  if (!resolvedName) {
+    const { data: existing, error: listErr } = await supabase
+      .from('tree_members')
+      .select('trees!inner(name)')
+      .eq('user_id', userId)
+      .eq('role', 'owner')
+      .eq('status', 'active');
+    if (listErr) throw new Error(`createNewTree failed: ${listErr.message}`);
+    const names = new Set(
+      (existing ?? []).map((row: any) => {
+        const t = Array.isArray(row.trees) ? row.trees[0] : row.trees;
+        return (t?.name ?? '') as string;
+      }),
+    );
+    resolvedName = 'Untitled tree';
+    for (let n = 2; names.has(resolvedName); n++) resolvedName = `Untitled tree ${n}`;
+  }
+
   const { data, error } = await supabase.rpc('bootstrap_tree', {
     p_owner_user_id: userId,
-    p_tree_name: name,
+    p_tree_name: resolvedName,
     p_seed_person_name: 'You',
   });
   if (error || !data) {

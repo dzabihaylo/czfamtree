@@ -18,7 +18,7 @@ export type TreeSwitcherProps = { currentTreeId: string };
 export default function TreeSwitcher({ currentTreeId }: TreeSwitcherProps) {
   const [open, setOpen] = useState(false);
   const [trees, setTrees] = useState<TreeListItem[] | null>(null);
-  const [, startTransition] = useTransition();
+  const [isCreating, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
@@ -65,9 +65,10 @@ export default function TreeSwitcher({ currentTreeId }: TreeSwitcherProps) {
 
   const handleCreate = useCallback(() => {
     startTransition(async () => {
-      const newId = await createNewTree('Untitled tree');
-      setOpen(false);
+      const newId = await createNewTree();
       router.push(`/tree/${newId}`);
+      router.refresh();
+      setOpen(false);
     });
   }, [router]);
 
@@ -156,11 +157,13 @@ export default function TreeSwitcher({ currentTreeId }: TreeSwitcherProps) {
           <button
             type="button"
             onClick={handleCreate}
-            className="flex w-full items-center gap-[8px] text-left text-[13px] font-semibold text-ink hover:bg-bg-soft"
+            disabled={isCreating}
+            aria-busy={isCreating}
+            className="flex w-full items-center gap-[8px] text-left text-[13px] font-semibold text-ink hover:bg-bg-soft disabled:opacity-60 disabled:cursor-wait"
             style={{ padding: '12px 16px' }}
           >
             <Plus size={13} />
-            New tree
+            {isCreating ? 'Creating…' : 'New tree'}
           </button>
         </div>
       )}
