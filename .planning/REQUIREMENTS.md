@@ -11,7 +11,7 @@
 - [ ] **AUTH-02**: User can sign in with Apple via Clerk
 - [ ] **AUTH-03**: User can sign in with email (magic link or code) via Clerk
 - [ ] **AUTH-04**: Sign-in screen matches handoff design pixel-for-pixel (split layout, cream backgrounds, 3-button stack, static illustration)
-- [ ] **AUTH-05**: Authenticated session persists across browser refresh
+- [x] **AUTH-05**: Authenticated session persists across browser refresh
 - [ ] **AUTH-06**: User can sign out from the user menu
 - [ ] **TREE-01**: On first sign-in, user auto-lands in a freshly created empty tree with a seed "You" node
 - [ ] **TREE-02**: User can create a new tree and name it inline from the topbar
@@ -138,14 +138,14 @@
 - [ ] **A11Y-03**: Tab order: topbar → canvas container → toolbar → side panel (when open)
 - [ ] **DESIGN-01**: Colors, typography, spacing, radii, shadows match design tokens in handoff `styles.css` exactly
 - [ ] **DESIGN-02**: Inline icons replaced 1:1 with `lucide-react` equivalents (User, Plus, X, Undo2, Redo2, Maximize2, Sparkles, Share2, Trash2, ExternalLink, …)
-- [ ] **DESIGN-03**: Tailwind v4 `@theme` maps handoff `:root` CSS variables directly (no drift between prototype and app)
+- [x] **DESIGN-03**: Tailwind v4 `@theme` maps handoff `:root` CSS variables directly (no drift between prototype and app)
 
 ### Testing & Deploy
 
 - [ ] **TEST-01**: Vitest unit tests cover `computeEdges`, `collisionNudge`, `layoutTidy` adapter, history reducers, cycle detection
 - [ ] **TEST-02**: Playwright E2E covers: sign in → new tree → add parent → edit name → undo → Tidy → share → accept invite in second browser context
 - [ ] **DEP-01**: Deployed to Vercel with Clerk + Supabase env vars configured
-- [ ] **DEP-02**: Next.js version pinned ≥ Next 16 (avoids CVE-2025-29927 and matches Clerk 7 requirements)
+- [x] **DEP-02**: Next.js version pinned ≥ Next 16 (avoids CVE-2025-29927 and matches Clerk 7 requirements)
 
 ## v2 Requirements
 
@@ -209,7 +209,7 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 | AUTH-02 | Phase 1 | Pending |
 | AUTH-03 | Phase 1 | Pending |
 | AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Pending |
 | TREE-01 | Phase 1 | Pending |
 | TREE-02 | Phase 1 | Pending |
@@ -225,8 +225,8 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 | DATA-08 | Phase 1 | Pending |
 | DATA-09 | Phase 1 | Pending |
 | DATA-10 | Phase 1 | Pending |
-| DESIGN-03 | Phase 1 | Pending |
-| DEP-02 | Phase 1 | Pending |
+| DESIGN-03 | Phase 1 | Complete |
+| DEP-02 | Phase 1 | Complete |
 | CANV-01 | Phase 2 | Pending |
 | CANV-02 | Phase 2 | Pending |
 | CANV-03 | Phase 2 | Pending |
