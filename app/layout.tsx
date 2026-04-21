@@ -1,5 +1,6 @@
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
+import { TreeStoreProvider } from '@/lib/store/tree-store';
 import './globals.css';
 
 const inter = Inter({
@@ -23,7 +24,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClerkProvider>
       <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-        <body>{children}</body>
+        <body>
+          <TreeStoreProvider>{children}</TreeStoreProvider>
+        </body>
       </html>
     </ClerkProvider>
   );
