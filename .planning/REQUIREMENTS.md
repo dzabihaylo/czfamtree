@@ -12,10 +12,10 @@
 - [x] **AUTH-03**: User can sign in with email (magic link or code) via Clerk
 - [x] **AUTH-04**: Sign-in screen matches handoff design pixel-for-pixel (split layout, cream backgrounds, 3-button stack, static illustration)
 - [x] **AUTH-05**: Authenticated session persists across browser refresh
-- [ ] **AUTH-06**: User can sign out from the user menu
-- [ ] **TREE-01**: On first sign-in, user auto-lands in a freshly created empty tree with a seed "You" node
-- [ ] **TREE-02**: User can create a new tree and name it inline from the topbar
-- [ ] **TREE-03**: User can switch between trees they own or have been invited to
+- [x] **AUTH-06**: User can sign out from the user menu
+- [x] **TREE-01**: On first sign-in, user auto-lands in a freshly created empty tree with a seed "You" node
+- [x] **TREE-02**: User can create a new tree and name it inline from the topbar
+- [x] **TREE-03**: User can switch between trees they own or have been invited to
 - [x] **TREE-04**: Tree is private to owner + invited members (enforced by Supabase RLS using `auth.jwt()->>'sub'`)
 
 ### Data Model & Persistence
@@ -210,10 +210,10 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 | AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Complete |
-| AUTH-06 | Phase 1 | Pending |
-| TREE-01 | Phase 1 | Pending |
-| TREE-02 | Phase 1 | Pending |
-| TREE-03 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Complete |
+| TREE-01 | Phase 1 | Complete |
+| TREE-02 | Phase 1 | Complete |
+| TREE-03 | Phase 1 | Complete |
 | TREE-04 | Phase 1 | Complete |
 | DATA-01 | Phase 1 | Complete |
 | DATA-02 | Phase 1 | Complete |

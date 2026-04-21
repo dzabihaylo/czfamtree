@@ -10,7 +10,7 @@ Milestone outcome: a user signs in with Google/Apple/email, lands in their tree,
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** — Next.js 16 + Clerk 7 + Supabase schema & RLS + sign-in screen; first sign-in lands user in an empty seeded tree
+- [x] **Phase 1: Foundation** — Next.js 16 + Clerk 7 + Supabase schema & RLS + sign-in screen; first sign-in lands user in an empty seeded tree
 - [ ] **Phase 2: Canvas, Nodes & Edit** — pan/zoom canvas, PersonNode rendering, selection, SidePanel with auto-save pill, derived SVG edges
 - [ ] **Phase 3: Authoring & History** — radial add menu with collision-nudge, undo/redo (zundo + Immer), toolbar, toasts, ⌘K search, delete-confirm, a11y sweep
 - [ ] **Phase 4: Tidy & Layout** — `@dagrejs/dagre` with couple-merge synthetic nodes, 300ms animated transition, single undoable history entry
@@ -32,12 +32,12 @@ Milestone outcome: a user signs in with Google/Apple/email, lands in their tree,
   3. I can name a tree inline, create additional trees, and switch between trees I own or have been invited to
   4. A second signed-in user cannot read my tree (RLS enforced via `auth.jwt()->>'sub'`)
   5. Signing out from the user menu returns me to the sign-in screen
-**Plans:** 2/4 plans executed
+**Plans:** 4/4 plans executed (Phase 1 complete)
 Plans:
 - [x] 01-01-PLAN.md — Infrastructure scaffolding (Next 16 + Clerk + Supabase client factories + Tailwind v4 tokens + fonts)
 - [x] 01-02-PLAN.md — Database schema + RLS + `bootstrap_tree` RPC + generated types + RLS smoke test [BLOCKING: supabase db push]
 - [x] 01-03-PLAN.md — Clerk SignIn + SignUp pages + split-50/50 auth layout + SVG illustration + bootstrap server action + root redirect
-- [ ] 01-04-PLAN.md — Authenticated shell: topbar (brand + TreeTitle + TreeSwitcher + UserMenu) + tree route + SeedPersonNode + EmptyTreeOverlay + AuthError + Playwright E2E
+- [x] 01-04-PLAN.md — Authenticated shell: topbar (brand + TreeTitle + TreeSwitcher + UserMenu) + tree route + SeedPersonNode + EmptyTreeOverlay + AuthError + Playwright E2E
 **UI hint:** yes
 **Research flags:** Step-relations data model decision must be resolved during phase planning before schema freeze — the `parent_ids` array (max 2) is a biologically-inspired choice that cannot represent step/adoptive parents beyond two. Planning must explicitly choose: (a) accept the limitation and document workaround for v1, or (b) promote parent-child to a `relationships(tree_id, a_id, b_id, kind, lineage_type)` table before DATA-06 is frozen. Per PITFALLS #19 and SUMMARY gaps.
 
@@ -132,7 +132,7 @@ Phase 4 depends only on Phase 3 (needs edges + history). Phase 5 depends on Phas
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/4 | In Progress|  |
+| 1. Foundation | 4/4 | Complete | 2026-04-21 |
 | 2. Canvas, Nodes & Edit | 0/TBD | Not started | — |
 | 3. Authoring & History | 0/TBD | Not started | — |
 | 4. Tidy & Layout | 0/TBD | Not started | — |
