@@ -1,0 +1,2405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chan-Zabihaylo Family Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* === Chan-Zabihaylo Family Tree — Swiss System === */
+:root {
+  --bg: oklch(0.985 0.003 80);
+  --bg-soft: oklch(0.965 0.004 80);
+  --bg-card: oklch(1 0 0);
+  --ink: oklch(0.18 0.008 80);
+  --ink-2: oklch(0.38 0.006 80);
+  --ink-3: oklch(0.62 0.006 80);
+  --rule: oklch(0.88 0.005 80);
+  --rule-soft: oklch(0.93 0.004 80);
+  --accent: oklch(0.52 0.14 250);
+  --accent-soft: oklch(0.94 0.03 250);
+  --danger: oklch(0.55 0.17 25);
+  --success: oklch(0.62 0.13 150);
+  --warning: oklch(0.72 0.14 75);
+
+  --sans: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --grid-size: 24px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
+
+/* --- Grid background --- */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, var(--rule-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--rule-soft) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+}
+
+/* --- Utility atoms --- */
+.mono { font-family: var(--mono); }
+.caps { text-transform: uppercase; letter-spacing: 0.08em; }
+.hair { border: 1px solid var(--rule); }
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  border: 1px solid var(--rule);
+  background: var(--bg-card);
+  color: var(--ink);
+  transition: background 0.12s ease, border-color 0.12s ease;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--bg-soft); border-color: var(--ink-3); }
+.btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.btn-primary:hover { background: var(--ink-2); border-color: var(--ink-2); }
+.btn-accent {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.btn-accent:hover { filter: brightness(1.08); }
+.btn-ghost { border-color: transparent; }
+.btn-ghost:hover { background: var(--bg-soft); border-color: var(--rule); }
+.btn-sm { padding: 6px 10px; font-size: 12px; }
+.btn-icon {
+  width: 32px; height: 32px; padding: 0;
+}
+
+/* --- Text edit inputs --- */
+.field-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+  display: block;
+}
+.field-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--rule);
+  background: var(--bg-card);
+  font-size: 14px;
+}
+.field-input:focus { border-color: var(--accent); }
+
+/* --- Canvas --- */
+.canvas-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  cursor: grab;
+}
+.canvas-wrap.panning { cursor: grabbing; }
+.canvas-inner {
+  position: absolute;
+  top: 0; left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* --- Person node --- */
+.node {
+  position: absolute;
+  width: 168px;
+  background: var(--bg-card);
+  border: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+.node:hover {
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.node.selected {
+  box-shadow: 0 0 0 2px var(--accent), 4px 4px 0 var(--accent);
+}
+.node.dragging {
+  cursor: grabbing;
+  box-shadow: 6px 6px 0 var(--ink);
+  z-index: 100;
+}
+.node-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+.node-photo-initials {
+  font-family: var(--mono);
+  font-size: 32px;
+  color: var(--ink-2);
+  font-weight: 400;
+}
+.node-body {
+  padding: 10px 12px 12px;
+}
+.node-relation {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+.node-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.node-years {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+}
+.node.is-me {
+  border-width: 2px;
+}
+.node.is-me::before {
+  content: 'YOU';
+  position: absolute;
+  top: -1px; right: -1px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  padding: 2px 6px;
+  z-index: 2;
+}
+
+/* --- Edges --- */
+.edges { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
+.edge {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1.5;
+}
+.edge.spouse {
+  stroke-dasharray: 0;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.edge.parent {
+  stroke: var(--ink);
+}
+
+/* --- Radial add menu --- */
+.radial {
+  position: absolute;
+  pointer-events: none;
+  z-index: 200;
+}
+.radial-btn {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  background: var(--bg-card);
+  border: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: auto;
+  transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 0.15s ease;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.6);
+}
+.radial.open .radial-btn { opacity: 1; }
+.radial-btn:hover {
+  background: var(--ink);
+  color: var(--bg);
+}
+.radial-btn-icon {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 500;
+}
+.radial-btn-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* --- Top bar --- */
+.topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 50;
+  gap: 16px;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+.topbar-brand-mark {
+  width: 20px; height: 20px;
+  background: var(--ink);
+  display: grid;
+  place-items: center;
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.topbar-title {
+  border-left: 1px solid var(--rule);
+  padding-left: 16px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.topbar-title strong { color: var(--ink); font-weight: 600; }
+.topbar-spacer { flex: 1; }
+
+.presence {
+  display: flex;
+  margin-right: 4px;
+}
+.presence-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  border: 2px solid var(--bg);
+  margin-left: -6px;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+}
+.presence-avatar:first-child { margin-left: 0; }
+
+/* --- Toolbar (bottom center) --- */
+.toolbar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--ink);
+  display: flex;
+  align-items: center;
+  z-index: 50;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.toolbar-btn {
+  width: 40px; height: 40px;
+  display: grid;
+  place-items: center;
+  border-right: 1px solid var(--rule);
+  color: var(--ink-2);
+}
+.toolbar-btn:last-child { border-right: none; }
+.toolbar-btn:hover { background: var(--bg-soft); color: var(--ink); }
+.toolbar-btn.active { background: var(--ink); color: var(--bg); }
+.toolbar-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.toolbar-divider { width: 1px; height: 24px; background: var(--rule); }
+.toolbar-zoom {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 0 12px;
+  color: var(--ink-2);
+  min-width: 60px;
+  text-align: center;
+}
+
+/* --- Side panel --- */
+.side-panel {
+  position: absolute;
+  top: 52px; right: 0; bottom: 0;
+  width: 360px;
+  background: var(--bg-card);
+  border-left: 1px solid var(--rule);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+.side-panel.closed { transform: translateX(100%); }
+.side-panel-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+}
+.side-panel-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+}
+.side-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+.side-panel-section {
+  margin-bottom: 24px;
+}
+.side-panel-section + .side-panel-section {
+  padding-top: 24px;
+  border-top: 1px solid var(--rule-soft);
+}
+
+/* --- Modal --- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0.18 0.008 80 / 0.4);
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  animation: fadeIn 0.15s ease;
+}
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--ink);
+  width: 480px;
+  max-width: calc(100vw - 40px);
+  box-shadow: 8px 8px 0 var(--ink);
+  animation: popIn 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.modal-sub {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+.modal-body { padding: 20px 24px; }
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Invite row --- */
+.invite-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.invite-row:last-child { border-bottom: none; }
+.invite-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+.role-select {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border: 1px solid var(--rule);
+  background: var(--bg-card);
+  cursor: pointer;
+}
+
+/* --- Tweaks panel --- */
+.tweaks-panel {
+  position: absolute;
+  right: 20px;
+  bottom: 80px;
+  width: 240px;
+  background: var(--bg-card);
+  border: 1px solid var(--ink);
+  z-index: 60;
+  box-shadow: 4px 4px 0 var(--ink);
+  font-size: 12px;
+}
+.tweaks-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-2);
+  display: flex;
+  justify-content: space-between;
+}
+.tweaks-body { padding: 12px 14px; }
+.tweak-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.tweak-row:last-child { margin-bottom: 0; }
+.tweak-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+.tweak-seg {
+  display: flex;
+  border: 1px solid var(--rule);
+}
+.tweak-seg button {
+  padding: 4px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  border-right: 1px solid var(--rule);
+}
+.tweak-seg button:last-child { border-right: none; }
+.tweak-seg button.on { background: var(--ink); color: var(--bg); }
+
+/* --- Toast --- */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 16px;
+  font-size: 13px;
+  z-index: 200;
+  box-shadow: 3px 3px 0 var(--accent);
+  animation: toastIn 0.18s ease;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* --- Sheet drawer --- */
+.drawer {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 320px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--ink);
+  z-index: 45;
+  display: flex;
+  transition: transform 0.25s cubic-bezier(0.3, 0.9, 0.3, 1);
+}
+.drawer.closed { transform: translateY(100%); }
+.drawer-side {
+  width: 280px;
+  border-right: 1px solid var(--rule);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.drawer-main {
+  flex: 1;
+  padding: 20px 24px;
+  overflow: auto;
+}
+
+/* --- Sheet table preview --- */
+.sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: var(--mono);
+}
+.sheet-table th, .sheet-table td {
+  border: 1px solid var(--rule);
+  padding: 6px 10px;
+  text-align: left;
+}
+.sheet-table th {
+  background: var(--bg-soft);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+}
+.sheet-table tr.new td { background: oklch(0.97 0.05 150); }
+.sheet-table tr.changed td { background: oklch(0.97 0.05 75); }
+
+/* --- Login screen --- */
+.login-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--bg);
+}
+.login-side {
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid var(--rule);
+}
+.login-art {
+  position: relative;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.login-brand-mark {
+  width: 28px; height: 28px;
+  background: var(--ink);
+  color: var(--bg);
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.login-headline {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-bottom: 16px;
+  max-width: 480px;
+}
+.login-sub {
+  font-size: 15px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  max-width: 420px;
+  margin-bottom: 32px;
+}
+.google-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+.google-btn:hover {
+  box-shadow: 4px 4px 0 var(--ink);
+  transform: translate(-2px, -2px);
+}
+.login-foot {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-3);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Feature label tags */
+.feat-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+.feat-tag-dot {
+  width: 6px; height: 6px; background: var(--accent);
+}
+
+/* Animated art for login */
+.login-mini-tree {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* --- Empty state overlay --- */
+.empty-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+.empty-card {
+  background: var(--bg-card);
+  border: 1px solid var(--ink);
+  padding: 24px 32px;
+  text-align: center;
+  pointer-events: auto;
+  box-shadow: 4px 4px 0 var(--ink);
+  max-width: 360px;
+}
+
+/* Avatar gradient seeds */
+.avatar-gen-0 { background: oklch(0.72 0.1 30); }
+.avatar-gen-1 { background: oklch(0.68 0.1 180); }
+.avatar-gen-2 { background: oklch(0.72 0.1 120); }
+.avatar-gen-3 { background: oklch(0.7 0.1 300); }
+.avatar-gen-4 { background: oklch(0.75 0.1 60); }
+
+/* Focus visible */
+button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Mobile: simpler */
+@media (max-width: 720px) {
+  .login-stage { grid-template-columns: 1fr; }
+  .login-art { display: none; }
+  .side-panel { width: 100%; }
+}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" data-presets="react">
+
+// Minimal stroked icons, 16px default, currentColor
+const Icon = ({ children, size = 16, ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
+    {children}
+  </svg>
+);
+
+const Icons = {
+  Plus: (p) => <Icon {...p}><path d="M12 5v14M5 12h14"/></Icon>,
+  Minus: (p) => <Icon {...p}><path d="M5 12h14"/></Icon>,
+  X: (p) => <Icon {...p}><path d="M6 6l12 12M18 6L6 18"/></Icon>,
+  Undo: (p) => <Icon {...p}><path d="M3 9l5-5M3 9l5 5M3 9h11a6 6 0 0 1 0 12H9"/></Icon>,
+  Redo: (p) => <Icon {...p}><path d="M21 9l-5-5M21 9l-5 5M21 9H10a6 6 0 0 0 0 12h5"/></Icon>,
+  Share: (p) => <Icon {...p}><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/></Icon>,
+  Sheet: (p) => <Icon {...p}><rect x="4" y="3" width="16" height="18"/><path d="M4 9h16M4 15h16M10 3v18M16 3v18"/></Icon>,
+  User: (p) => <Icon {...p}><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></Icon>,
+  Home: (p) => <Icon {...p}><path d="M3 11l9-7 9 7v10H3z"/></Icon>,
+  Search: (p) => <Icon {...p}><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></Icon>,
+  Grid: (p) => <Icon {...p}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></Icon>,
+  Fit: (p) => <Icon {...p}><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></Icon>,
+  Settings: (p) => <Icon {...p}><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M21 12h-3M6 12H3M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1M18.4 18.4l-2.1-2.1M7.7 7.7L5.6 5.6"/></Icon>,
+  Check: (p) => <Icon {...p}><path d="M5 12l5 5L20 7"/></Icon>,
+  Link: (p) => <Icon {...p}><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></Icon>,
+  Upload: (p) => <Icon {...p}><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></Icon>,
+  Download: (p) => <Icon {...p}><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></Icon>,
+  Refresh: (p) => <Icon {...p}><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></Icon>,
+  Edit: (p) => <Icon {...p}><path d="M4 20h4l10-10-4-4L4 16v4zM14 6l4 4"/></Icon>,
+  Trash: (p) => <Icon {...p}><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></Icon>,
+  ChevronDown: (p) => <Icon {...p}><path d="M6 9l6 6 6-6"/></Icon>,
+  Dots: (p) => <Icon {...p}><circle cx="5" cy="12" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="19" cy="12" r="1.2" fill="currentColor"/></Icon>,
+  Copy: (p) => <Icon {...p}><rect x="8" y="8" width="12" height="12"/><path d="M16 4H4v12h4"/></Icon>,
+  Sparkle: (p) => <Icon {...p}><path d="M12 3l1.5 5L18 9.5 13.5 11 12 16l-1.5-5L6 9.5 10.5 8z"/></Icon>,
+  Google: ({size = 18}) => (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.9c-.3 1.4-1 2.5-2.2 3.3v2.7h3.6c2.1-1.9 3.2-4.8 3.2-7.9z"/>
+      <path fill="#34A853" d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.7c-1 .7-2.3 1.1-3.6 1.1-2.8 0-5.2-1.9-6-4.4H2.3v2.8C4.2 20.7 7.8 23 12 23z"/>
+      <path fill="#FBBC05" d="M6 14.2c-.2-.6-.3-1.3-.3-2.2s.1-1.6.3-2.2V7H2.3C1.5 8.5 1 10.2 1 12s.5 3.5 1.3 5l3.7-2.8z"/>
+      <path fill="#EA4335" d="M12 5.4c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.4 2.1 14.9 1 12 1 7.8 1 4.2 3.3 2.3 7L6 9.8c.8-2.5 3.2-4.4 6-4.4z"/>
+    </svg>
+  ),
+};
+
+window.Icons = Icons;
+
+
+// ============================================================
+// DATA MODEL + GRAPH LAYOUT
+// ============================================================
+
+const uid = () => 'p_' + Math.random().toString(36).slice(2, 9);
+
+const initials = (name) => {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
+const relationLabel = (person, rootId, people) => {
+  if (!rootId || person.id === rootId) return 'you';
+  const root = people.find(p => p.id === rootId);
+  if (!root) return person.relation || '';
+  // Spouse of root
+  if (root.spouseIds?.includes(person.id)) return 'spouse';
+  // Parent of root
+  if (root.parentIds?.includes(person.id)) {
+    return person.gender === 'f' ? 'mother' : person.gender === 'm' ? 'father' : 'parent';
+  }
+  // Child of root
+  if (person.parentIds?.includes(rootId) || root.childIds?.includes(person.id)) {
+    return person.gender === 'f' ? 'daughter' : person.gender === 'm' ? 'son' : 'child';
+  }
+  // Sibling: shares a parent
+  const rootParents = root.parentIds || [];
+  if (rootParents.some(pid => person.parentIds?.includes(pid))) {
+    return person.gender === 'f' ? 'sister' : person.gender === 'm' ? 'brother' : 'sibling';
+  }
+  // Grandparent
+  const rootGrandparents = rootParents.flatMap(pid => {
+    const parent = people.find(p => p.id === pid);
+    return parent?.parentIds || [];
+  });
+  if (rootGrandparents.includes(person.id)) {
+    return person.gender === 'f' ? 'grandmother' : person.gender === 'm' ? 'grandfather' : 'grandparent';
+  }
+  return person.relation || 'relative';
+};
+
+// Compute edges from people
+function computeEdges(people) {
+  const edges = [];
+  const seen = new Set();
+  for (const p of people) {
+    // Spouse edges (deduped)
+    for (const sid of (p.spouseIds || [])) {
+      const key = [p.id, sid].sort().join('-');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      edges.push({ kind: 'spouse', a: p.id, b: sid });
+    }
+    // Parent->child edges
+    for (const pid of (p.parentIds || [])) {
+      edges.push({ kind: 'parent', a: pid, b: p.id });
+    }
+  }
+  return edges;
+}
+
+// Starter sample data (Dave's family)
+const SAMPLE_PEOPLE = [
+  {
+    id: 'p_dave', name: 'Dave Zabihaylo', gender: 'm', birthYear: 1981, deathYear: null,
+    x: 0, y: 0, isMe: true, location: 'Vancouver, BC',
+    spouseIds: ['p_kath'], parentIds: [], childIds: ['p_olivia'],
+    notes: 'Dad. Product designer. Loves sourdough and snowboarding.',
+  },
+  {
+    id: 'p_kath', name: 'Katherine Chan', gender: 'f', birthYear: 1981, deathYear: null,
+    x: 220, y: 0, location: 'Vancouver, BC',
+    spouseIds: ['p_dave'], parentIds: [], childIds: ['p_olivia'],
+    notes: '',
+  },
+  {
+    id: 'p_olivia', name: 'Olivia Chan-Zabihaylo', gender: 'f', birthYear: 2012, deathYear: null,
+    x: 110, y: 240, location: 'Vancouver, BC',
+    spouseIds: [], parentIds: ['p_dave', 'p_kath'], childIds: [],
+    notes: 'Artist in training. Age 13.',
+  },
+];
+
+// Node dimensions (kept in sync w/ CSS)
+const NODE_W = 168;
+const NODE_H = 236; // approx total card height
+
+// ============================================================
+// EDGE PATH HELPERS
+// ============================================================
+
+function spousePath(a, b) {
+  // Horizontal line between two spouses at node midline
+  const ay = a.y + 70; // roughly between photo and body (photo ~ 168x168 + a bit)
+  const by = b.y + 70;
+  const x1 = a.x + NODE_W;
+  const x2 = b.x;
+  if (x2 < x1) {
+    // overlap; connect centers instead
+    return `M ${a.x + NODE_W / 2} ${ay} L ${b.x + NODE_W / 2} ${by}`;
+  }
+  return `M ${x1} ${ay} L ${x2} ${by}`;
+}
+
+function parentPath(parent, child) {
+  // Orthogonal: from parent bottom → horizontal midpoint → down to child top
+  const px = parent.x + NODE_W / 2;
+  const py = parent.y + NODE_H;
+  const cx = child.x + NODE_W / 2;
+  const cy = child.y;
+  const mid = (py + cy) / 2;
+  return `M ${px} ${py} L ${px} ${mid} L ${cx} ${mid} L ${cx} ${cy}`;
+}
+
+// (assign after layoutTree is declared below)
+
+// ============================================================
+// AUTO-LAYOUT — tidy generational layout
+// ============================================================
+// Strategy:
+//  1. Find "roots" = couples with no parents (topmost generation).
+//     If multiple root clusters, lay them side-by-side.
+//  2. Compute generation (depth from root couple) for each person via BFS
+//     along parent edges: parent.gen = child.gen - 1.
+//  3. Group by generation, place rows top→bottom.
+//  4. Within each gen, place couples adjacent (spouses side-by-side) and
+//     order them so children align under the midpoint of their parents.
+// This is a lightweight heuristic — good enough to prevent overlap & feel "tidy".
+
+function layoutTree(peopleIn) {
+  if (!peopleIn.length) return peopleIn;
+  const people = peopleIn.map(p => ({ ...p }));
+  const byId = new Map(people.map(p => [p.id, p]));
+
+  // Assign generation levels. Lowest known person = 0; parents = -1, etc.
+  // We anchor on any "self"/isMe first, else arbitrary.
+  const anchor = people.find(p => p.isMe) || people[0];
+  const gen = new Map([[anchor.id, 0]]);
+  const queue = [anchor.id];
+  while (queue.length) {
+    const id = queue.shift();
+    const me = byId.get(id);
+    const g = gen.get(id);
+    // Parents are one gen up
+    for (const pid of (me.parentIds || [])) {
+      if (byId.has(pid) && !gen.has(pid)) {
+        gen.set(pid, g - 1);
+        queue.push(pid);
+      }
+    }
+    // Spouses same gen
+    for (const sid of (me.spouseIds || [])) {
+      if (byId.has(sid) && !gen.has(sid)) {
+        gen.set(sid, g);
+        queue.push(sid);
+      }
+    }
+    // Children one gen down
+    for (const other of people) {
+      if (other.parentIds?.includes(id) && !gen.has(other.id)) {
+        gen.set(other.id, g + 1);
+        queue.push(other.id);
+      }
+    }
+  }
+  // Anyone orphan: drop at gen 0
+  for (const p of people) if (!gen.has(p.id)) gen.set(p.id, 0);
+
+  // Group
+  const rows = new Map();
+  for (const p of people) {
+    const g = gen.get(p.id);
+    if (!rows.has(g)) rows.set(g, []);
+    rows.get(g).push(p);
+  }
+
+  const GAP_X = 40;
+  const COUPLE_GAP = 24;
+  const GAP_Y = 120;
+  const nodeW = NODE_W;
+  const nodeH = NODE_H;
+
+  // Build couple units per row (2 spouses as one unit, singles as unit of 1)
+  const rowUnits = new Map();
+  for (const [g, members] of rows.entries()) {
+    const used = new Set();
+    const units = [];
+    for (const p of members) {
+      if (used.has(p.id)) continue;
+      const partners = (p.spouseIds || []).filter(sid => !used.has(sid) && byId.get(sid) && gen.get(sid) === g);
+      if (partners.length) {
+        const sp = byId.get(partners[0]);
+        const order = [p, sp];
+        units.push({ ids: order.map(o => o.id), members: order, key: '' });
+        used.add(p.id); used.add(sp.id);
+      } else {
+        units.push({ ids: [p.id], members: [p], key: '' });
+        used.add(p.id);
+      }
+    }
+    for (const u of units) u.key = u.ids.slice().sort().join('-');
+    rowUnits.set(g, units);
+  }
+
+  const sortedGens = [...rowUnits.keys()].sort((a,b) => a-b);
+  const unitWidth = (u) => u.members.length * nodeW + (u.members.length - 1) * COUPLE_GAP;
+
+  // Build parent-unit map: for each unit, which unit in gen-1 are its parents?
+  const parentUnitOf = new Map(); // unit.key -> parent unit key
+  const childrenOfUnit = new Map(); // parent unit key -> [child unit keys]
+  for (let i = 1; i < sortedGens.length; i++) {
+    const prevUnits = rowUnits.get(sortedGens[i-1]);
+    const units = rowUnits.get(sortedGens[i]);
+    for (const u of units) {
+      const person = u.members[0];
+      const parentIds = (person.parentIds || []).filter(pid => byId.has(pid));
+      if (!parentIds.length) continue;
+      const pu = prevUnits.find(pu => pu.ids.some(id => parentIds.includes(id)));
+      if (pu) {
+        parentUnitOf.set(u.key, pu.key);
+        if (!childrenOfUnit.has(pu.key)) childrenOfUnit.set(pu.key, []);
+        childrenOfUnit.get(pu.key).push(u.key);
+      }
+    }
+  }
+
+  // Unit lookup
+  const unitByKey = new Map();
+  for (const units of rowUnits.values()) for (const u of units) unitByKey.set(u.key, u);
+
+  // Subtree width: max(own width, sum of children subtree widths + gaps)
+  const subtreeW = new Map();
+  const computeSubtreeW = (key) => {
+    if (subtreeW.has(key)) return subtreeW.get(key);
+    const u = unitByKey.get(key);
+    const own = unitWidth(u);
+    const kids = childrenOfUnit.get(key) || [];
+    if (!kids.length) { subtreeW.set(key, own); return own; }
+    const childrenW = kids.reduce((s, k, i) => s + computeSubtreeW(k) + (i > 0 ? GAP_X : 0), 0);
+    const w = Math.max(own, childrenW);
+    subtreeW.set(key, w);
+    return w;
+  };
+
+  // Position roots: top-gen units, stacked left-to-right
+  const unitX = new Map();
+  const placeSubtree = (key, leftX) => {
+    const u = unitByKey.get(key);
+    const sw = computeSubtreeW(key);
+    const own = unitWidth(u);
+    const kids = childrenOfUnit.get(key) || [];
+    if (!kids.length) {
+      unitX.set(key, leftX + (sw - own) / 2);
+      return;
+    }
+    // Place children first, filling the subtree width
+    const childrenW = kids.reduce((s, k, i) => s + computeSubtreeW(k) + (i > 0 ? GAP_X : 0), 0);
+    let childStart = leftX + (sw - childrenW) / 2;
+    let firstChildCenter = null;
+    let lastChildCenter = null;
+    for (const k of kids) {
+      const cw = computeSubtreeW(k);
+      placeSubtree(k, childStart);
+      const cu = unitByKey.get(k);
+      const cOwn = unitWidth(cu);
+      const cCenter = unitX.get(k) + cOwn / 2;
+      if (firstChildCenter == null) firstChildCenter = cCenter;
+      lastChildCenter = cCenter;
+      childStart += cw + GAP_X;
+    }
+    // Center parent over children span
+    const childrenMid = (firstChildCenter + lastChildCenter) / 2;
+    unitX.set(key, childrenMid - own / 2);
+  };
+
+  const topUnits = rowUnits.get(sortedGens[0]);
+  let rootCursor = 0;
+  for (const u of topUnits) {
+    placeSubtree(u.key, rootCursor);
+    rootCursor += computeSubtreeW(u.key) + GAP_X;
+  }
+
+  // Normalize
+  let minX = Infinity;
+  for (const x of unitX.values()) minX = Math.min(minX, x);
+  if (!isFinite(minX)) minX = 0;
+
+  // Assign
+  for (let i = 0; i < sortedGens.length; i++) {
+    const g = sortedGens[i];
+    const y = i * (nodeH + GAP_Y);
+    const units = rowUnits.get(g);
+    for (const u of units) {
+      let x = unitX.get(u.key) - minX;
+      for (const m of u.members) {
+        const obj = byId.get(m.id);
+        obj.x = x;
+        obj.y = y;
+        x += nodeW + COUPLE_GAP;
+      }
+    }
+  }
+
+  return Array.from(byId.values());
+}
+
+window.FamilyModel = {
+  uid, initials, relationLabel, computeEdges,
+  SAMPLE_PEOPLE, NODE_W, NODE_H,
+  spousePath, parentPath,
+  layoutTree,
+};
+
+
+// ============================================================
+// LOGIN SCREEN
+// ============================================================
+
+
+function LoginScreen({ onSignIn }) {
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSignIn = () => {
+    setLoading(true);
+    setTimeout(() => onSignIn({
+      name: 'Dave Zabihaylo',
+      email: 'dave@example.com',
+      avatar: 'DZ',
+    }), 900);
+  };
+
+  return (
+    <div className="login-stage">
+      <div className="login-side">
+        <div className="login-brand">
+          <div className="login-brand-mark">CZ</div>
+          <span>Family Tree</span>
+        </div>
+
+        <div>
+          <h1 className="login-headline">Every name, a branch.<br/>Every branch, a story.</h1>
+          <p className="login-sub">
+            Build your family tree by clicking, dragging, and connecting &mdash; or sync it from a Google Sheet. Invite relatives to collaborate in real time.
+          </p>
+
+          <button className="google-btn" onClick={handleSignIn} disabled={loading}>
+            {loading ? (
+              <>
+                <div style={{width:18,height:18,border:'2px solid var(--ink)',borderTopColor:'transparent',borderRadius:'50%',animation:'spin 0.7s linear infinite'}}/>
+                <span>Signing in&hellip;</span>
+              </>
+            ) : (
+              <>
+                <window.Icons.Google size={18}/>
+                <span>Continue with Google</span>
+              </>
+            )}
+          </button>
+
+          <div style={{marginTop: 28, display: 'flex', flexWrap: 'wrap', maxWidth: 420}}>
+            <span className="feat-tag"><span className="feat-tag-dot"/>Click-to-add canvas</span>
+            <span className="feat-tag"><span className="feat-tag-dot"/>Google Sheets sync</span>
+            <span className="feat-tag"><span className="feat-tag-dot"/>Invite &amp; roles</span>
+            <span className="feat-tag"><span className="feat-tag-dot"/>Real-time cursors</span>
+          </div>
+        </div>
+
+        <div className="login-foot">
+          <span>v0.1 · preview</span>
+          <span>Private by default</span>
+        </div>
+      </div>
+
+      <div className="login-art grid-bg">
+        <div className="login-mini-tree">
+          <svg viewBox="0 0 400 400" width="80%" style={{maxWidth: 460}}>
+            <defs>
+              <pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="0.6" fill="oklch(0.62 0.006 80)"/>
+              </pattern>
+            </defs>
+
+            {/* Edges */}
+            <g stroke="oklch(0.18 0.008 80)" strokeWidth="1.5" fill="none">
+              <path d="M 120 120 L 280 120"/>
+              <path d="M 200 120 L 200 200 L 120 200 L 120 270"/>
+              <path d="M 200 200 L 280 200 L 280 270"/>
+            </g>
+            <g stroke="oklch(0.52 0.14 250)" strokeWidth="2" fill="none">
+              <path d="M 120 90 L 120 150" opacity="0"/>
+            </g>
+
+            {/* Top row: grandparents (stylized) */}
+            <g>
+              <rect x="60" y="60" width="120" height="60" fill="oklch(1 0 0)" stroke="oklch(0.18 0.008 80)" strokeWidth="1.5"/>
+              <rect x="60" y="60" width="60" height="60" fill="url(#dots)"/>
+              <text x="130" y="85" fontFamily="Inter" fontSize="11" fontWeight="600" fill="oklch(0.18 0.008 80)">Dave</text>
+              <text x="130" y="100" fontFamily="JetBrains Mono" fontSize="9" fill="oklch(0.38 0.006 80)">1981 –</text>
+
+              <rect x="220" y="60" width="120" height="60" fill="oklch(1 0 0)" stroke="oklch(0.18 0.008 80)" strokeWidth="1.5"/>
+              <rect x="220" y="60" width="60" height="60" fill="url(#dots)"/>
+              <text x="290" y="85" fontFamily="Inter" fontSize="11" fontWeight="600" fill="oklch(0.18 0.008 80)">Katherine</text>
+              <text x="290" y="100" fontFamily="JetBrains Mono" fontSize="9" fill="oklch(0.38 0.006 80)">1981 –</text>
+            </g>
+
+            {/* Spouse connector (accent) */}
+            <path d="M 180 90 L 220 90" stroke="oklch(0.52 0.14 250)" strokeWidth="2" fill="none"/>
+
+            {/* Child */}
+            <g>
+              <rect x="140" y="270" width="120" height="60" fill="oklch(1 0 0)" stroke="oklch(0.18 0.008 80)" strokeWidth="2"/>
+              <rect x="140" y="270" width="60" height="60" fill="url(#dots)"/>
+              <text x="210" y="295" fontFamily="Inter" fontSize="11" fontWeight="600" fill="oklch(0.18 0.008 80)">Olivia</text>
+              <text x="210" y="310" fontFamily="JetBrains Mono" fontSize="9" fill="oklch(0.38 0.006 80)">2012 –</text>
+            </g>
+
+            {/* Annotations */}
+            <text x="60" y="40" fontFamily="JetBrains Mono" fontSize="10" letterSpacing="1" fill="oklch(0.38 0.006 80)">GEN 01 · PARENTS</text>
+            <text x="60" y="250" fontFamily="JetBrains Mono" fontSize="10" letterSpacing="1" fill="oklch(0.38 0.006 80)">GEN 02 · CHILDREN</text>
+
+            {/* Corner index */}
+            <text x="370" y="390" fontFamily="JetBrains Mono" fontSize="9" textAnchor="end" fill="oklch(0.62 0.006 80)">fig. 01 — the Chan-Zabihaylo family</text>
+          </svg>
+        </div>
+
+        {/* Small cursor indicator */}
+        <div style={{
+          position: 'absolute', top: 40, right: 40,
+          display: 'flex', alignItems: 'center', gap: 6,
+          fontFamily: 'var(--mono)', fontSize: 10,
+          textTransform: 'uppercase', letterSpacing: '0.1em',
+          color: 'var(--ink-2)',
+        }}>
+          <span style={{width: 6, height: 6, background: 'oklch(0.62 0.13 150)', borderRadius: '50%'}}/>
+          3 editors online
+        </div>
+      </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+window.LoginScreen = LoginScreen;
+
+
+// ============================================================
+// PERSON NODE
+// ============================================================
+
+function PersonNode({ person, rootId, people, selected, onSelect, onStartDrag, onOpenRadial, onDoubleClick, showPhoto, showYears, showRelation }) {
+  const { NODE_W, initials, relationLabel } = window.FamilyModel;
+  const rel = showRelation ? relationLabel(person, rootId, people) : '';
+
+  const avatarClass = `avatar-gen-${Math.abs(person.name.charCodeAt(0) + (person.name.charCodeAt(1) || 0)) % 5}`;
+
+  return (
+    <div
+      className={`node ${selected ? 'selected' : ''} ${person.isMe ? 'is-me' : ''}`}
+      style={{ left: person.x, top: person.y, width: NODE_W }}
+      onMouseDown={(e) => {
+        if (e.button !== 0) return;
+        onSelect(person.id);
+        onStartDrag(e, person.id);
+      }}
+      onDoubleClick={(e) => { e.stopPropagation(); onDoubleClick(person.id); }}
+    >
+      {showPhoto && (
+        <div className={`node-photo ${avatarClass}`}>
+          <span className="node-photo-initials" style={{color: 'oklch(1 0 0 / 0.85)'}}>
+            {initials(person.name)}
+          </span>
+          {/* subtle diagonal stripe placeholder hint */}
+          <svg style={{position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.08, mixBlendMode: 'multiply'}} viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+              <pattern id={`stripe-${person.id}`} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <rect width="2" height="6" fill="black"/>
+              </pattern>
+            </defs>
+            <rect width="100" height="100" fill={`url(#stripe-${person.id})`}/>
+          </svg>
+        </div>
+      )}
+      <div className="node-body">
+        {rel && <div className="node-relation">{rel}</div>}
+        <div className="node-name">{person.name}</div>
+        {showYears && (
+          <div className="node-years">
+            {person.birthYear || '—'} &ndash; {person.deathYear || (person.birthYear ? '' : '—')}
+          </div>
+        )}
+      </div>
+
+      {selected && (
+        <button
+          className="node-add-btn"
+          onClick={(e) => { e.stopPropagation(); onOpenRadial(person.id); }}
+          style={{
+            position: 'absolute',
+            bottom: -14, left: '50%',
+            transform: 'translateX(-50%)',
+            width: 28, height: 28,
+            background: 'var(--accent)',
+            color: 'white',
+            border: '1px solid var(--accent)',
+            display: 'grid',
+            placeItems: 'center',
+            boxShadow: '2px 2px 0 var(--ink)',
+            zIndex: 3,
+          }}
+          title="Add relative"
+        >
+          <window.Icons.Plus size={14}/>
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// RADIAL ADD MENU
+// ============================================================
+function RadialMenu({ anchor, onPick, onClose }) {
+  const items = [
+    { key: 'parent', label: 'Parent', sym: '↑', angle: -90 },
+    { key: 'spouse', label: 'Spouse', sym: '↔', angle: 0 },
+    { key: 'child', label: 'Child', sym: '↓', angle: 90 },
+    { key: 'sibling', label: 'Sibling', sym: '←', angle: 180 },
+  ];
+  const R = 90;
+
+  React.useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    const onClick = (e) => {
+      if (!e.target.closest('.radial')) onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    setTimeout(() => window.addEventListener('mousedown', onClick), 10);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('mousedown', onClick);
+    };
+  }, [onClose]);
+
+  return (
+    <div className="radial open" style={{ left: anchor.x, top: anchor.y }}>
+      {items.map((it, i) => {
+        const rad = it.angle * Math.PI / 180;
+        const dx = Math.cos(rad) * R;
+        const dy = Math.sin(rad) * R;
+        return (
+          <button
+            key={it.key}
+            className="radial-btn"
+            style={{
+              left: dx, top: dy,
+              transitionDelay: `${i * 30}ms`,
+              transform: 'translate(-50%, -50%) scale(1)',
+            }}
+            onClick={(e) => { e.stopPropagation(); onPick(it.key); }}
+          >
+            <span className="radial-btn-icon">{it.sym}</span>
+            <span className="radial-btn-label">{it.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ============================================================
+// SIDE PANEL - PERSON DETAILS
+// ============================================================
+function SidePanel({ person, people, onUpdate, onClose, onDelete, onSetRoot, lastSavedAt }) {
+  if (!person) return null;
+  const upd = (patch) => onUpdate(person.id, patch);
+  const [justSaved, setJustSaved] = React.useState(false);
+  React.useEffect(() => {
+    if (!lastSavedAt) return;
+    setJustSaved(true);
+    const t = setTimeout(() => setJustSaved(false), 1400);
+    return () => clearTimeout(t);
+  }, [lastSavedAt]);
+
+  return (
+    <div className="side-panel">
+      <div className="side-panel-header">
+        <div>
+          <div className="side-panel-title" style={{display: 'flex', alignItems: 'center', gap: 8}}>
+            <span>Person · {person.id.slice(0,6)}</span>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '2px 6px',
+              background: justSaved ? 'oklch(0.92 0.08 150)' : 'var(--bg-soft)',
+              border: '1px solid ' + (justSaved ? 'var(--success)' : 'var(--rule)'),
+              color: justSaved ? 'var(--success)' : 'var(--ink-3)',
+              fontFamily: 'var(--mono)', fontSize: 9, letterSpacing: '0.08em',
+              transition: 'all 0.2s ease',
+            }}>
+              <span style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: justSaved ? 'var(--success)' : 'var(--ink-3)',
+              }}/>
+              {justSaved ? 'Saved' : 'Auto-saves'}
+            </span>
+          </div>
+          <div style={{fontSize: 18, fontWeight: 600, letterSpacing: '-0.015em', marginTop: 4}}>
+            {person.name || 'Unnamed'}
+          </div>
+        </div>
+        <button className="btn btn-icon btn-ghost" onClick={onClose}><window.Icons.X/></button>
+      </div>
+
+      <div className="side-panel-content">
+        <div className="side-panel-section">
+          <label className="field-label">Full name</label>
+          <input className="field-input" value={person.name} onChange={e => upd({name: e.target.value})}/>
+        </div>
+
+        <div className="side-panel-section" style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, paddingTop: 24, borderTop: '1px solid var(--rule-soft)'}}>
+          <div>
+            <label className="field-label">Born</label>
+            <input className="field-input mono" placeholder="YYYY" value={person.birthYear || ''} onChange={e => upd({birthYear: e.target.value ? parseInt(e.target.value) : null})}/>
+          </div>
+          <div>
+            <label className="field-label">Died</label>
+            <input className="field-input mono" placeholder="YYYY" value={person.deathYear || ''} onChange={e => upd({deathYear: e.target.value ? parseInt(e.target.value) : null})}/>
+          </div>
+        </div>
+
+        <div className="side-panel-section">
+          <label className="field-label">Gender</label>
+          <div style={{display: 'flex', gap: 6}}>
+            {[['m','Male'],['f','Female'],['x','Other']].map(([v,l]) => (
+              <button
+                key={v}
+                className="btn btn-sm"
+                style={person.gender === v ? {background:'var(--ink)', color:'var(--bg)', borderColor:'var(--ink)'} : {}}
+                onClick={() => upd({gender: v})}
+              >{l}</button>
+            ))}
+          </div>
+        </div>
+
+        <div className="side-panel-section">
+          <label className="field-label">Location</label>
+          <input className="field-input" placeholder="e.g. Vancouver, BC" value={person.location || ''} onChange={e => upd({location: e.target.value})}/>
+        </div>
+
+        <div className="side-panel-section">
+          <label className="field-label">Notes</label>
+          <textarea
+            className="field-input"
+            rows={4}
+            style={{resize: 'vertical', fontFamily: 'inherit'}}
+            placeholder="Stories, memories, a short bio…"
+            value={person.notes || ''}
+            onChange={e => upd({notes: e.target.value})}
+          />
+        </div>
+
+        <div className="side-panel-section">
+          <label className="field-label">Relations</label>
+          <div style={{fontSize: 12, color: 'var(--ink-2)', lineHeight: 1.6, fontFamily: 'var(--mono)'}}>
+            <div>Parents: {(person.parentIds || []).map(id => people.find(p => p.id === id)?.name).filter(Boolean).join(', ') || '—'}</div>
+            <div>Spouses: {(person.spouseIds || []).map(id => people.find(p => p.id === id)?.name).filter(Boolean).join(', ') || '—'}</div>
+            <div>Children: {people.filter(p => p.parentIds?.includes(person.id)).map(p => p.name).join(', ') || '—'}</div>
+          </div>
+        </div>
+
+        <div className="side-panel-section" style={{display: 'flex', gap: 8}}>
+          <button className="btn btn-sm" onClick={() => onSetRoot(person.id)}>
+            <window.Icons.User size={13}/> Center on this person
+          </button>
+          {!person.isMe && (
+            <button className="btn btn-sm" style={{color: 'var(--danger)', borderColor: 'var(--rule)'}} onClick={() => onDelete(person.id)}>
+              <window.Icons.Trash size={13}/> Remove
+            </button>
+          )}
+        </div>
+
+        <div style={{
+          padding: '12px 0', marginTop: 12,
+          borderTop: '1px solid var(--rule-soft)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        }}>
+          <div style={{fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.08em'}}>
+            Changes save automatically
+          </div>
+          <button className="btn btn-primary btn-sm" onClick={onClose}>
+            <window.Icons.Check size={13}/> Done
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+window.FamilyUI = { PersonNode, RadialMenu, SidePanel };
+
+
+// ============================================================
+// SHARE MODAL
+// ============================================================
+function ShareModal({ onClose, invites, setInvites, onToast }) {
+  const [email, setEmail] = React.useState('');
+  const [role, setRole] = React.useState('editor');
+  const [linkAccess, setLinkAccess] = React.useState('restricted');
+
+  const addInvite = () => {
+    if (!email.trim() || !email.includes('@')) return;
+    setInvites([...invites, {
+      email: email.trim(),
+      role,
+      status: 'pending',
+      avatar: email.trim().slice(0, 2).toUpperCase(),
+    }]);
+    setEmail('');
+    onToast('Invitation sent to ' + email.trim());
+  };
+
+  const updateRole = (i, newRole) => {
+    const next = [...invites];
+    next[i] = { ...next[i], role: newRole };
+    setInvites(next);
+  };
+
+  const removeInvite = (i) => {
+    setInvites(invites.filter((_, idx) => idx !== i));
+  };
+
+  const copyLink = () => {
+    onToast('Link copied to clipboard');
+  };
+
+  return (
+    <div className="modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal" style={{width: 520}}>
+        <div className="modal-header">
+          <div>
+            <div className="modal-title">Share this tree</div>
+            <div className="modal-sub">“Chan-Zabihaylo Family Tree”</div>
+          </div>
+          <button className="btn btn-icon btn-ghost" onClick={onClose}><window.Icons.X/></button>
+        </div>
+
+        <div className="modal-body">
+          {/* Invite row */}
+          <div style={{display: 'flex', gap: 8, marginBottom: 20}}>
+            <input
+              className="field-input"
+              placeholder="Add people by email…"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && addInvite()}
+              style={{flex: 1}}
+            />
+            <select className="role-select" value={role} onChange={e => setRole(e.target.value)} style={{fontSize: 12}}>
+              <option value="editor">Editor</option>
+              <option value="viewer">Viewer</option>
+            </select>
+            <button className="btn btn-primary btn-sm" onClick={addInvite}>Invite</button>
+          </div>
+
+          {/* People with access */}
+          <div style={{marginBottom: 20}}>
+            <div className="field-label">People with access</div>
+            <div className="invite-row">
+              <div style={{display: 'flex', alignItems: 'center', gap: 12}}>
+                <div className="invite-avatar" style={{background: 'oklch(0.52 0.14 250)'}}>DZ</div>
+                <div>
+                  <div style={{fontSize: 13, fontWeight: 500}}>Dave Zabihaylo (you)</div>
+                  <div style={{fontSize: 11, color: 'var(--ink-3)', fontFamily: 'var(--mono)'}}>dave@example.com</div>
+                </div>
+              </div>
+              <div style={{fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.06em'}}>Owner</div>
+            </div>
+            {invites.map((inv, i) => (
+              <div key={i} className="invite-row">
+                <div style={{display: 'flex', alignItems: 'center', gap: 12}}>
+                  <div className="invite-avatar">{inv.avatar}</div>
+                  <div>
+                    <div style={{fontSize: 13, fontWeight: 500}}>{inv.email}</div>
+                    <div style={{fontSize: 11, color: 'var(--ink-3)', fontFamily: 'var(--mono)'}}>
+                      {inv.status === 'pending' ? 'Invitation pending' : 'Active'}
+                    </div>
+                  </div>
+                </div>
+                <div style={{display: 'flex', alignItems: 'center', gap: 4}}>
+                  <select className="role-select" value={inv.role} onChange={e => updateRole(i, e.target.value)}>
+                    <option value="editor">Editor</option>
+                    <option value="viewer">Viewer</option>
+                  </select>
+                  <button className="btn btn-icon btn-ghost btn-sm" onClick={() => removeInvite(i)} title="Remove">
+                    <window.Icons.X size={13}/>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Link access */}
+          <div style={{paddingTop: 16, borderTop: '1px solid var(--rule)'}}>
+            <div className="field-label">General access</div>
+            <div style={{display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0'}}>
+              <div style={{
+                width: 32, height: 32, border: '1px solid var(--rule)',
+                display: 'grid', placeItems: 'center', color: 'var(--ink-2)',
+              }}>
+                <window.Icons.Link size={14}/>
+              </div>
+              <div style={{flex: 1}}>
+                <select className="role-select" value={linkAccess} onChange={e => setLinkAccess(e.target.value)} style={{border: 'none', padding: 0, fontSize: 13, textTransform: 'none', letterSpacing: 0, fontFamily: 'var(--sans)', fontWeight: 500}}>
+                  <option value="restricted">Restricted</option>
+                  <option value="link-view">Anyone with link can view</option>
+                  <option value="link-edit">Anyone with link can edit</option>
+                </select>
+                <div style={{fontSize: 11, color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: 2}}>
+                  {linkAccess === 'restricted'
+                    ? 'Only invited people can open this tree'
+                    : linkAccess === 'link-view'
+                    ? 'Anyone on the internet can view'
+                    : 'Anyone with the link can edit — be careful'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button className="btn" onClick={copyLink}>
+            <window.Icons.Copy size={13}/> Copy link
+          </button>
+          <button className="btn btn-primary" onClick={onClose}>Done</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// SHEET SYNC DRAWER
+// ============================================================
+function SheetDrawer({ open, onClose, onImport, onToast }) {
+  const [tab, setTab] = React.useState('link');
+  const [url, setUrl] = React.useState('');
+  const [syncing, setSyncing] = React.useState(false);
+  const [connected, setConnected] = React.useState(false);
+
+  const connect = () => {
+    if (!url.includes('docs.google.com')) {
+      onToast('Paste a valid Google Sheets URL');
+      return;
+    }
+    setSyncing(true);
+    setTimeout(() => {
+      setSyncing(false);
+      setConnected(true);
+      onToast('Connected · 12 rows detected');
+    }, 1100);
+  };
+
+  const importNow = () => {
+    onImport();
+    onToast('Imported 4 new people from sheet');
+    onClose();
+  };
+
+  const sample = [
+    { name: 'Dave Zabihaylo', born: 1981, died: '', rel: 'self', parent1: '', parent2: '', spouse: 'Katherine Chan', status: 'existing' },
+    { name: 'Katherine Chan', born: 1981, died: '', rel: 'spouse', parent1: '', parent2: '', spouse: 'Dave Zabihaylo', status: 'existing' },
+    { name: 'Olivia Chan-Zabihaylo', born: 2012, died: '', rel: 'child', parent1: 'Dave Zabihaylo', parent2: 'Katherine Chan', spouse: '', status: 'existing' },
+    { name: 'Mira Chan', born: 1953, died: '', rel: 'parent', parent1: '', parent2: '', spouse: 'Henry Chan', status: 'new' },
+    { name: 'Henry Chan', born: 1949, died: 2019, rel: 'parent', parent1: '', parent2: '', spouse: 'Mira Chan', status: 'new' },
+    { name: 'Yuri Zabihaylo', born: 1955, died: '', rel: 'parent', parent1: '', parent2: '', spouse: 'Anna Zabihaylo', status: 'new' },
+    { name: 'Anna Zabihaylo', born: 1958, died: '', rel: 'parent', parent1: '', parent2: '', spouse: 'Yuri Zabihaylo', status: 'new' },
+  ];
+
+  return (
+    <div className={`drawer ${open ? '' : 'closed'}`}>
+      <div className="drawer-side">
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          <div style={{fontFamily: 'var(--mono)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--ink-3)'}}>Data source</div>
+          <button className="btn btn-icon btn-ghost btn-sm" onClick={onClose}><window.Icons.X size={13}/></button>
+        </div>
+
+        <div style={{display: 'flex', border: '1px solid var(--rule)'}}>
+          {['link', 'upload'].map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              style={{
+                flex: 1, padding: '8px 10px',
+                fontFamily: 'var(--mono)', fontSize: 10,
+                textTransform: 'uppercase', letterSpacing: '0.08em',
+                background: tab === t ? 'var(--ink)' : 'var(--bg-card)',
+                color: tab === t ? 'var(--bg)' : 'var(--ink-2)',
+                borderRight: t === 'link' ? '1px solid var(--rule)' : 'none',
+              }}
+            >
+              {t === 'link' ? 'Google Sheet' : 'CSV upload'}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'link' ? (
+          <>
+            <div>
+              <label className="field-label">Sheet URL</label>
+              <input
+                className="field-input mono"
+                style={{fontSize: 11}}
+                placeholder="https://docs.google.com/spreadsheets/…"
+                value={url}
+                onChange={e => setUrl(e.target.value)}
+              />
+            </div>
+            {!connected ? (
+              <button className="btn btn-primary btn-sm" onClick={connect} disabled={syncing}>
+                {syncing ? 'Connecting…' : <>Connect <window.Icons.Link size={12}/></>}
+              </button>
+            ) : (
+              <>
+                <div style={{
+                  padding: 10, border: '1px solid var(--rule)',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  fontSize: 12,
+                }}>
+                  <span style={{width: 8, height: 8, background: 'var(--success)', borderRadius: '50%'}}/>
+                  <div style={{flex: 1}}>
+                    <div style={{fontWeight: 500}}>Connected</div>
+                    <div style={{fontSize: 10, color: 'var(--ink-3)', fontFamily: 'var(--mono)'}}>Auto-sync every 30s</div>
+                  </div>
+                </div>
+                <button className="btn btn-accent btn-sm" onClick={importNow}>
+                  <window.Icons.Download size={12}/> Import 4 new
+                </button>
+              </>
+            )}
+            <div style={{marginTop: 'auto', fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--ink-3)', lineHeight: 1.5}}>
+              <div style={{marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.1em'}}>Template</div>
+              Columns: name, born, died, relation, parent_1, parent_2, spouse, location, notes
+              <a href="#" style={{color: 'var(--accent)', display: 'block', marginTop: 6}}>Copy template ↗</a>
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{
+              border: '1px dashed var(--rule)',
+              padding: 24, textAlign: 'center',
+              flex: 1,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}>
+              <window.Icons.Upload size={24}/>
+              <div style={{fontSize: 12}}>Drop CSV here</div>
+              <div style={{fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--ink-3)'}}>or click to browse</div>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="drawer-main">
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12}}>
+          <div>
+            <div style={{fontFamily: 'var(--mono)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--ink-3)'}}>Preview · family_tree.csv</div>
+            <div style={{fontSize: 14, fontWeight: 600, marginTop: 2}}>7 rows · 4 new, 3 matched</div>
+          </div>
+          <div style={{display: 'flex', gap: 12, fontFamily: 'var(--mono)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em'}}>
+            <span style={{display: 'flex', alignItems: 'center', gap: 6}}>
+              <span style={{width: 10, height: 10, background: 'oklch(0.97 0.05 150)', border: '1px solid var(--rule)'}}/> New
+            </span>
+            <span style={{display: 'flex', alignItems: 'center', gap: 6}}>
+              <span style={{width: 10, height: 10, background: 'oklch(1 0 0)', border: '1px solid var(--rule)'}}/> Matched
+            </span>
+          </div>
+        </div>
+
+        <table className="sheet-table">
+          <thead>
+            <tr>
+              <th>Name</th><th>Born</th><th>Died</th><th>Relation</th><th>Parent 1</th><th>Parent 2</th><th>Spouse</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sample.map((row, i) => (
+              <tr key={i} className={row.status === 'new' ? 'new' : ''}>
+                <td style={{fontWeight: 500}}>{row.name}</td>
+                <td>{row.born}</td>
+                <td>{row.died || '—'}</td>
+                <td>{row.rel}</td>
+                <td>{row.parent1 || '—'}</td>
+                <td>{row.parent2 || '—'}</td>
+                <td>{row.spouse || '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+window.ShareUI = { ShareModal, SheetDrawer };
+
+
+(function(){
+// ============================================================
+// MAIN APP — Canvas, toolbar, pan/zoom, undo/redo
+// ============================================================
+// destructured inside App below
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "showPhoto": true,
+  "showYears": true,
+  "showRelation": true,
+  "density": "comfy",
+  "nodeStyle": "card",
+  "accentHue": 250
+}/*EDITMODE-END*/;
+
+const { PersonNode, RadialMenu, SidePanel } = window.FamilyUI;
+const { ShareModal, SheetDrawer } = window.ShareUI;
+const { SAMPLE_PEOPLE, uid, computeEdges, spousePath, parentPath, NODE_W, NODE_H } = window.FamilyModel;
+function App() {
+  // --- Auth ---
+  const [user, setUser] = React.useState(null);
+
+  // --- Core state ---
+  const [people, setPeople] = React.useState(SAMPLE_PEOPLE);
+  const [selectedId, setSelectedId] = React.useState(null);
+  const [rootId, setRootId] = React.useState('p_dave');
+  const [radial, setRadial] = React.useState(null); // {personId, x, y} in screen coords
+
+  // --- Undo/redo ---
+  const [history, setHistory] = React.useState([SAMPLE_PEOPLE]);
+  const [hIndex, setHIndex] = React.useState(0);
+
+  // --- Canvas transform ---
+  const [transform, setTransform] = React.useState({ x: 400, y: 180, k: 1 });
+  const [panning, setPanning] = React.useState(false);
+  const panStart = React.useRef(null);
+  const canvasRef = React.useRef(null);
+
+  // --- Drag state ---
+  const dragState = React.useRef(null);
+
+  // --- UI state ---
+  const [showShare, setShowShare] = React.useState(false);
+  const [showSheet, setShowSheet] = React.useState(false);
+  const [showTweaks, setShowTweaks] = React.useState(false);
+  const [sidePanelOpen, setSidePanelOpen] = React.useState(false);
+  const [toast, setToast] = React.useState(null);
+  const [tweaks, setTweaks] = React.useState(TWEAK_DEFAULTS);
+  const [invites, setInvites] = React.useState([
+    { email: 'katherine@example.com', role: 'editor', status: 'active', avatar: 'KC' },
+    { email: 'grandma.chan@example.com', role: 'viewer', status: 'pending', avatar: 'MC' },
+  ]);
+  const [lastSavedAt, setLastSavedAt] = React.useState(null);
+
+  // --- Toast helper ---
+  const showToast = (msg) => {
+    setToast(msg);
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => setToast(null), 2200);
+  };
+
+  // --- Commit changes to history ---
+  const commit = (nextPeople) => {
+    setPeople(nextPeople);
+    const newHistory = history.slice(0, hIndex + 1);
+    newHistory.push(nextPeople);
+    setHistory(newHistory);
+    setHIndex(newHistory.length - 1);
+  };
+
+  const undo = () => {
+    if (hIndex === 0) return;
+    setHIndex(hIndex - 1);
+    setPeople(history[hIndex - 1]);
+    showToast('Undo');
+  };
+  const redo = () => {
+    if (hIndex >= history.length - 1) return;
+    setHIndex(hIndex + 1);
+    setPeople(history[hIndex + 1]);
+    showToast('Redo');
+  };
+
+  // --- Keyboard shortcuts ---
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+      else if ((e.metaKey || e.ctrlKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
+      else if (e.key === 'Escape') { setSelectedId(null); setRadial(null); setSidePanelOpen(false); }
+      else if (e.key === 'Enter' && selectedId) { setSidePanelOpen(true); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [hIndex, history, selectedId]);
+
+  // --- Pan/zoom ---
+  const onCanvasMouseDown = (e) => {
+    if (e.target.closest('.node') || e.target.closest('.radial') || e.target.closest('.topbar') || e.target.closest('.toolbar')) return;
+    setPanning(true);
+    panStart.current = { x: e.clientX, y: e.clientY, tx: transform.x, ty: transform.y };
+    setRadial(null);
+    setSelectedId(null);
+  };
+
+  React.useEffect(() => {
+    const onMove = (e) => {
+      if (panning && panStart.current) {
+        setTransform(t => ({
+          ...t,
+          x: panStart.current.tx + (e.clientX - panStart.current.x),
+          y: panStart.current.ty + (e.clientY - panStart.current.y),
+        }));
+      } else if (dragState.current) {
+        const { id, startX, startY, origX, origY } = dragState.current;
+        const dx = (e.clientX - startX) / transform.k;
+        const dy = (e.clientY - startY) / transform.k;
+        setPeople(prev => prev.map(p => p.id === id ? { ...p, x: origX + dx, y: origY + dy } : p));
+      }
+    };
+    const onUp = () => {
+      if (dragState.current) {
+        // commit the drag
+        setPeople(prev => {
+          commit(prev);
+          return prev;
+        });
+        dragState.current = null;
+      }
+      setPanning(false);
+      panStart.current = null;
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, [panning, transform.k, history, hIndex]);
+
+  const onWheel = (e) => {
+    if (!canvasRef.current) return;
+    e.preventDefault();
+    if (e.ctrlKey || e.metaKey) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const delta = -e.deltaY * 0.002;
+      const newK = Math.max(0.3, Math.min(2.5, transform.k * (1 + delta)));
+      const kRatio = newK / transform.k;
+      setTransform({
+        k: newK,
+        x: mx - (mx - transform.x) * kRatio,
+        y: my - (my - transform.y) * kRatio,
+      });
+    } else {
+      setTransform(t => ({ ...t, x: t.x - e.deltaX, y: t.y - e.deltaY }));
+    }
+  };
+
+  const zoomBy = (factor) => {
+    if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const mx = rect.width / 2;
+    const my = rect.height / 2;
+    const newK = Math.max(0.3, Math.min(2.5, transform.k * factor));
+    const kRatio = newK / transform.k;
+    setTransform({
+      k: newK,
+      x: mx - (mx - transform.x) * kRatio,
+      y: my - (my - transform.y) * kRatio,
+    });
+  };
+
+  const fitView = () => setTransform({ x: 400, y: 180, k: 1 });
+
+  // --- Drag node ---
+  const startDrag = (e, id) => {
+    e.stopPropagation();
+    const person = people.find(p => p.id === id);
+    if (!person) return;
+    dragState.current = {
+      id, startX: e.clientX, startY: e.clientY,
+      origX: person.x, origY: person.y,
+    };
+  };
+
+  // --- Open radial at a node ---
+  const openRadial = (personId) => {
+    const p = people.find(pp => pp.id === personId);
+    if (!p) return;
+    // Anchor at node center, in canvas coords (radial sits inside canvas-inner)
+    setRadial({
+      personId,
+      x: p.x + NODE_W / 2,
+      y: p.y + NODE_H / 2,
+    });
+  };
+
+  // --- Add relative ---
+  const addRelative = (anchorId, kind) => {
+    const anchor = people.find(p => p.id === anchorId);
+    if (!anchor) return;
+
+    const newId = uid();
+    const newPerson = {
+      id: newId,
+      name: 'New Person',
+      gender: 'x',
+      birthYear: null, deathYear: null,
+      spouseIds: [], parentIds: [], childIds: [],
+      x: anchor.x, y: anchor.y,
+    };
+
+    let next = [...people];
+
+    if (kind === 'spouse') {
+      newPerson.x = anchor.x + NODE_W + 52;
+      newPerson.y = anchor.y;
+      newPerson.spouseIds = [anchor.id];
+      next = next.map(p => p.id === anchor.id ? { ...p, spouseIds: [...(p.spouseIds || []), newId] } : p);
+    } else if (kind === 'child') {
+      newPerson.x = anchor.x;
+      newPerson.y = anchor.y + NODE_H + 60;
+      const parents = [anchor.id, ...(anchor.spouseIds || [])].slice(0, 2);
+      newPerson.parentIds = parents;
+      next = next.map(p =>
+        parents.includes(p.id) ? { ...p, childIds: [...(p.childIds || []), newId] } : p
+      );
+    } else if (kind === 'parent') {
+      newPerson.x = anchor.x - 110;
+      newPerson.y = anchor.y - (NODE_H + 60);
+      next = next.map(p => p.id === anchor.id ? { ...p, parentIds: [...(p.parentIds || []), newId] } : p);
+      newPerson.childIds = [anchor.id];
+    } else if (kind === 'sibling') {
+      newPerson.x = anchor.x - NODE_W - 52;
+      newPerson.y = anchor.y;
+      newPerson.parentIds = [...(anchor.parentIds || [])];
+      next = next.map(p =>
+        (anchor.parentIds || []).includes(p.id) ? { ...p, childIds: [...(p.childIds || []), newId] } : p
+      );
+    }
+
+    next.push(newPerson);
+    // Simple collision nudge: push overlapping nodes aside on the same row
+    const rowY = newPerson.y;
+    const minGap = NODE_W + 32;
+    const conflicts = next
+      .filter(p => p.id !== newId && Math.abs(p.y - rowY) < 10 && Math.abs(p.x - newPerson.x) < minGap);
+    if (conflicts.length) {
+      // Shift new node left of anchor if there's room, else keep pushing right
+      const occupied = next.filter(p => p.id !== newId && Math.abs(p.y - rowY) < 10).map(p => p.x);
+      let tryX = newPerson.x;
+      let step = minGap;
+      let dir = kind === 'sibling' ? -1 : 1;
+      while (occupied.some(ox => Math.abs(ox - tryX) < minGap)) {
+        tryX += dir * step;
+      }
+      newPerson.x = tryX;
+    }
+    commit(next);
+    setRadial(null);
+    setSelectedId(newId);
+    setSidePanelOpen(true);
+    showToast(`Added ${kind}`);
+  };
+
+  const updatePerson = (id, patch) => {
+    const next = people.map(p => p.id === id ? { ...p, ...patch } : p);
+    commit(next);
+    setLastSavedAt(Date.now());
+  };
+
+  const deletePerson = (id) => {
+    const next = people
+      .filter(p => p.id !== id)
+      .map(p => ({
+        ...p,
+        parentIds: (p.parentIds || []).filter(pid => pid !== id),
+        spouseIds: (p.spouseIds || []).filter(sid => sid !== id),
+        childIds: (p.childIds || []).filter(cid => cid !== id),
+      }));
+    commit(next);
+    setSelectedId(null);
+    setSidePanelOpen(false);
+    showToast('Person removed');
+  };
+
+  const importFromSheet = () => {
+    // Add the sample ancestors
+    const mira = { id: uid(), name: 'Mira Chan', gender: 'f', birthYear: 1953, deathYear: null, x: 400, y: -300, spouseIds: [], parentIds: [], childIds: ['p_kath'] };
+    const henry = { id: uid(), name: 'Henry Chan', gender: 'm', birthYear: 1949, deathYear: 2019, x: 600, y: -300, spouseIds: [], parentIds: [], childIds: ['p_kath'] };
+    const yuri = { id: uid(), name: 'Yuri Zabihaylo', gender: 'm', birthYear: 1955, deathYear: null, x: -400, y: -300, spouseIds: [], parentIds: [], childIds: ['p_dave'] };
+    const anna = { id: uid(), name: 'Anna Zabihaylo', gender: 'f', birthYear: 1958, deathYear: null, x: -200, y: -300, spouseIds: [], parentIds: [], childIds: ['p_dave'] };
+    mira.spouseIds = [henry.id]; henry.spouseIds = [mira.id];
+    yuri.spouseIds = [anna.id]; anna.spouseIds = [yuri.id];
+
+    const next = people.map(p => {
+      if (p.id === 'p_dave') return { ...p, parentIds: [yuri.id, anna.id] };
+      if (p.id === 'p_kath') return { ...p, parentIds: [henry.id, mira.id] };
+      return p;
+    }).concat([yuri, anna, henry, mira]);
+    commit(next);
+  };
+
+  // --- Tweaks protocol ---
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const msg = e.data;
+      if (!msg || typeof msg !== 'object') return;
+      if (msg.type === '__activate_edit_mode') setShowTweaks(true);
+      else if (msg.type === '__deactivate_edit_mode') setShowTweaks(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const setTweak = (key, val) => {
+    const next = { ...tweaks, [key]: val };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: val } }, '*');
+  };
+
+  // --- Derived ---
+  const selectedPerson = people.find(p => p.id === selectedId) || null;
+  const edges = React.useMemo(() => computeEdges(people), [people]);
+
+  // Compute SVG bbox
+  const bbox = React.useMemo(() => {
+    if (!people.length) return { minX: 0, minY: 0, w: 2000, h: 2000 };
+    const xs = people.map(p => p.x);
+    const ys = people.map(p => p.y);
+    const minX = Math.min(...xs) - 400;
+    const minY = Math.min(...ys) - 400;
+    const maxX = Math.max(...xs) + NODE_W + 400;
+    const maxY = Math.max(...ys) + NODE_H + 400;
+    return { minX, minY, w: maxX - minX, h: maxY - minY };
+  }, [people]);
+
+  // --- RENDER LOGIN ---
+  if (!user) {
+    return <window.LoginScreen onSignIn={setUser}/>;
+  }
+
+  return (
+    <>
+      {/* Topbar */}
+      <div className="topbar">
+        <div className="topbar-brand">
+          <div className="topbar-brand-mark">CZ</div>
+          <span>Family Tree</span>
+        </div>
+        <div className="topbar-title">
+          <strong>Chan-Zabihaylo Family Tree</strong>
+          <span style={{fontFamily: 'var(--mono)', fontSize: 11, marginLeft: 8, color: 'var(--ink-3)'}}>
+            · {people.length} people
+          </span>
+        </div>
+
+        <div className="topbar-spacer"/>
+
+        {/* Presence */}
+        <div className="presence" title="3 collaborators online">
+          <div className="presence-avatar" style={{background: 'oklch(0.52 0.14 250)'}}>DZ</div>
+          <div className="presence-avatar" style={{background: 'oklch(0.62 0.13 150)'}}>KC</div>
+          <div className="presence-avatar" style={{background: 'oklch(0.72 0.14 75)'}}>MC</div>
+        </div>
+
+        <button className="btn btn-sm" onClick={() => setShowSheet(s => !s)}>
+          <window.Icons.Sheet size={13}/> Sheet sync
+        </button>
+        <button className="btn btn-primary btn-sm" onClick={() => setShowShare(true)}>
+          <window.Icons.Share size={13}/> Share
+        </button>
+
+        <div style={{width: 1, height: 24, background: 'var(--rule)'}}/>
+
+        <div className="invite-avatar" title={user.email} style={{background: 'var(--ink)'}}>{user.avatar}</div>
+      </div>
+
+      {/* Canvas */}
+      <div
+        ref={canvasRef}
+        className={`canvas-wrap grid-bg ${panning ? 'panning' : ''}`}
+        style={{top: 52}}
+        onMouseDown={onCanvasMouseDown}
+        onWheel={onWheel}
+      >
+        <div
+          className="canvas-inner"
+          style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.k})` }}
+        >
+          {/* Edges */}
+          <svg
+            className="edges"
+            style={{ left: bbox.minX, top: bbox.minY }}
+            width={bbox.w}
+            height={bbox.h}
+            viewBox={`${bbox.minX} ${bbox.minY} ${bbox.w} ${bbox.h}`}
+          >
+            {edges.map((e, i) => {
+              const a = people.find(p => p.id === e.a);
+              const b = people.find(p => p.id === e.b);
+              if (!a || !b) return null;
+              if (e.kind === 'spouse') {
+                return <path key={i} className="edge spouse" d={spousePath(a, b)}/>;
+              }
+              return <path key={i} className="edge parent" d={parentPath(a, b)}/>;
+            })}
+          </svg>
+
+          {/* Nodes */}
+          {people.map(p => (
+            <PersonNode
+              key={p.id}
+              person={p}
+              rootId={rootId}
+              people={people}
+              selected={p.id === selectedId}
+              onSelect={(id) => { setSelectedId(id); setRadial(null); }}
+              onStartDrag={startDrag}
+              onOpenRadial={openRadial}
+              onDoubleClick={(id) => { setSelectedId(id); setSidePanelOpen(true); }}
+              showPhoto={tweaks.showPhoto}
+              showYears={tweaks.showYears}
+              showRelation={tweaks.showRelation}
+            />
+          ))}
+
+          {/* Radial */}
+          {radial && (
+            <RadialMenu
+              anchor={{ x: radial.x, y: radial.y }}
+              onPick={(kind) => addRelative(radial.personId, kind)}
+              onClose={() => setRadial(null)}
+            />
+          )}
+        </div>
+
+        {/* Hints */}
+        {people.length === 1 && (
+          <div className="empty-state">
+            <div className="empty-card">
+              <div style={{fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 8}}>Getting started</div>
+              <div style={{fontSize: 15, fontWeight: 500, marginBottom: 8}}>Click your card to add relatives</div>
+              <div style={{fontSize: 13, color: 'var(--ink-2)'}}>Or <button className="btn btn-sm" style={{display: 'inline-flex'}} onClick={() => setShowSheet(true)}>import from a sheet</button></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Toolbar (bottom) */}
+      <div className="toolbar">
+        <button className="toolbar-btn" onClick={undo} disabled={hIndex === 0} title="Undo (⌘Z)">
+          <window.Icons.Undo/>
+        </button>
+        <button className="toolbar-btn" onClick={redo} disabled={hIndex >= history.length - 1} title="Redo (⌘⇧Z)">
+          <window.Icons.Redo/>
+        </button>
+        <div className="toolbar-divider"/>
+        <button className="toolbar-btn" onClick={() => zoomBy(0.85)} title="Zoom out">
+          <window.Icons.Minus/>
+        </button>
+        <div className="toolbar-zoom">{Math.round(transform.k * 100)}%</div>
+        <button className="toolbar-btn" onClick={() => zoomBy(1.18)} title="Zoom in">
+          <window.Icons.Plus/>
+        </button>
+        <button className="toolbar-btn" onClick={fitView} title="Fit to view">
+          <window.Icons.Fit/>
+        </button>
+        <button className="toolbar-btn" onClick={() => {
+          const laidOut = window.FamilyModel.layoutTree(people);
+          commit(laidOut);
+          showToast('Tidied layout');
+        }} title="Tidy layout">
+          <window.Icons.Sparkle/>
+        </button>
+        <div className="toolbar-divider"/>
+        <button className="toolbar-btn" onClick={() => setSidePanelOpen(o => !o)} title="Details panel" disabled={!selectedId}>
+          <window.Icons.User/>
+        </button>
+      </div>
+
+      {/* Side panel */}
+      {sidePanelOpen && selectedPerson && (
+        <SidePanel
+          person={selectedPerson}
+          people={people}
+          onUpdate={updatePerson}
+          onClose={() => setSidePanelOpen(false)}
+          onDelete={deletePerson}
+          onSetRoot={(id) => { setRootId(id); showToast('Centered on ' + (people.find(p=>p.id===id)?.name || '')); }}
+          lastSavedAt={lastSavedAt}
+        />
+      )}
+
+      {/* Share modal */}
+      {showShare && (
+        <ShareModal
+          onClose={() => setShowShare(false)}
+          invites={invites}
+          setInvites={setInvites}
+          onToast={showToast}
+        />
+      )}
+
+      {/* Sheet drawer */}
+      <SheetDrawer
+        open={showSheet}
+        onClose={() => setShowSheet(false)}
+        onImport={importFromSheet}
+        onToast={showToast}
+      />
+
+      {/* Tweaks panel */}
+      {showTweaks && (
+        <div className="tweaks-panel">
+          <div className="tweaks-header">
+            <span>Tweaks</span>
+            <span style={{color: 'var(--ink-3)'}}>v0.1</span>
+          </div>
+          <div className="tweaks-body">
+            <div className="tweak-row">
+              <span className="tweak-label">Photos</span>
+              <div className="tweak-seg">
+                <button className={tweaks.showPhoto ? 'on' : ''} onClick={() => setTweak('showPhoto', true)}>On</button>
+                <button className={!tweaks.showPhoto ? 'on' : ''} onClick={() => setTweak('showPhoto', false)}>Off</button>
+              </div>
+            </div>
+            <div className="tweak-row">
+              <span className="tweak-label">Years</span>
+              <div className="tweak-seg">
+                <button className={tweaks.showYears ? 'on' : ''} onClick={() => setTweak('showYears', true)}>On</button>
+                <button className={!tweaks.showYears ? 'on' : ''} onClick={() => setTweak('showYears', false)}>Off</button>
+              </div>
+            </div>
+            <div className="tweak-row">
+              <span className="tweak-label">Relation</span>
+              <div className="tweak-seg">
+                <button className={tweaks.showRelation ? 'on' : ''} onClick={() => setTweak('showRelation', true)}>On</button>
+                <button className={!tweaks.showRelation ? 'on' : ''} onClick={() => setTweak('showRelation', false)}>Off</button>
+              </div>
+            </div>
+            <div className="tweak-row">
+              <span className="tweak-label">Accent</span>
+              <div className="tweak-seg">
+                {[250, 150, 25, 300].map(h => (
+                  <button
+                    key={h}
+                    className={tweaks.accentHue === h ? 'on' : ''}
+                    onClick={() => {
+                      setTweak('accentHue', h);
+                      document.documentElement.style.setProperty('--accent', `oklch(0.52 0.14 ${h})`);
+                    }}
+                    style={{padding: '4px 6px'}}
+                  >
+                    <span style={{display: 'inline-block', width: 10, height: 10, background: `oklch(0.52 0.14 ${h})`}}/>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast && <div className="toast">{toast}</div>}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+})();
+
+</script>
+</body>
+</html>

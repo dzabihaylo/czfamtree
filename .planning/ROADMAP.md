@@ -32,7 +32,12 @@ Milestone outcome: a user signs in with Google/Apple/email, lands in their tree,
   3. I can name a tree inline, create additional trees, and switch between trees I own or have been invited to
   4. A second signed-in user cannot read my tree (RLS enforced via `auth.jwt()->>'sub'`)
   5. Signing out from the user menu returns me to the sign-in screen
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — Infrastructure scaffolding (Next 16 + Clerk + Supabase client factories + Tailwind v4 tokens + fonts)
+- [ ] 01-02-PLAN.md — Database schema + RLS + `bootstrap_tree` RPC + generated types + RLS smoke test [BLOCKING: supabase db push]
+- [ ] 01-03-PLAN.md — Clerk SignIn + SignUp pages + split-50/50 auth layout + SVG illustration + bootstrap server action + root redirect
+- [ ] 01-04-PLAN.md — Authenticated shell: topbar (brand + TreeTitle + TreeSwitcher + UserMenu) + tree route + SeedPersonNode + EmptyTreeOverlay + AuthError + Playwright E2E
 **UI hint:** yes
 **Research flags:** Step-relations data model decision must be resolved during phase planning before schema freeze — the `parent_ids` array (max 2) is a biologically-inspired choice that cannot represent step/adoptive parents beyond two. Planning must explicitly choose: (a) accept the limitation and document workaround for v1, or (b) promote parent-child to a `relationships(tree_id, a_id, b_id, kind, lineage_type)` table before DATA-06 is frozen. Per PITFALLS #19 and SUMMARY gaps.
 
@@ -127,7 +132,7 @@ Phase 4 depends only on Phase 3 (needs edges + history). Phase 5 depends on Phas
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | — |
+| 1. Foundation | 0/4 | Planned | — |
 | 2. Canvas, Nodes & Edit | 0/TBD | Not started | — |
 | 3. Authoring & History | 0/TBD | Not started | — |
 | 4. Tidy & Layout | 0/TBD | Not started | — |
