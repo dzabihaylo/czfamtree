@@ -16,20 +16,20 @@
 - [ ] **TREE-01**: On first sign-in, user auto-lands in a freshly created empty tree with a seed "You" node
 - [ ] **TREE-02**: User can create a new tree and name it inline from the topbar
 - [ ] **TREE-03**: User can switch between trees they own or have been invited to
-- [ ] **TREE-04**: Tree is private to owner + invited members (enforced by Supabase RLS using `auth.jwt()->>'sub'`)
+- [x] **TREE-04**: Tree is private to owner + invited members (enforced by Supabase RLS using `auth.jwt()->>'sub'`)
 
 ### Data Model & Persistence
 
-- [ ] **DATA-01**: `people` table stores `id, tree_id, name, gender, pronouns, birth_year, death_year, birth_place, notes, spouse_ids[], parent_ids[], child_ids[], x, y, is_me, created_at, updated_at`
-- [ ] **DATA-02**: `trees` table stores `id, name, owner_id, created_at, updated_at`
-- [ ] **DATA-03**: `tree_members` table stores `tree_id, user_id (text, Clerk sub), role (owner/editor/viewer), status (active/pending), created_at`
-- [ ] **DATA-04**: `invites` table stores `id, tree_id, email, role, status (pending/accepted/revoked), token, expires_at`
-- [ ] **DATA-05**: RLS policies enforce tree access via `SECURITY DEFINER` helper `user_tree_ids(uid text)` to avoid cross-table recursion
-- [ ] **DATA-06**: `parent_ids` constrained to max 2 entries; CHECK constraint rejects self-parent (`id = ANY(parent_ids)`)
-- [ ] **DATA-07**: Cycle-detection walk runs server-side on any relationship mutation; mutation rejected if it creates a cycle
-- [ ] **DATA-08**: GIN indexes on `spouse_ids`, `parent_ids`, `child_ids` for relationship lookups
-- [ ] **DATA-09**: Unique partial index enforces one `is_me=true` person per tree per user
-- [ ] **DATA-10**: `people.id` is a UUID generated client-side (`uid()`) and accepted by the server (matches handoff model)
+- [x] **DATA-01**: `people` table stores `id, tree_id, name, gender, pronouns, birth_year, death_year, birth_place, notes, spouse_ids[], parent_ids[], child_ids[], x, y, is_me, created_at, updated_at`
+- [x] **DATA-02**: `trees` table stores `id, name, owner_id, created_at, updated_at`
+- [x] **DATA-03**: `tree_members` table stores `tree_id, user_id (text, Clerk sub), role (owner/editor/viewer), status (active/pending), created_at`
+- [x] **DATA-04**: `invites` table stores `id, tree_id, email, role, status (pending/accepted/revoked), token, expires_at`
+- [x] **DATA-05**: RLS policies enforce tree access via `SECURITY DEFINER` helper `user_tree_ids(uid text)` to avoid cross-table recursion
+- [x] **DATA-06**: `parent_ids` constrained to max 2 entries; CHECK constraint rejects self-parent (`id = ANY(parent_ids)`)
+- [x] **DATA-07**: Cycle-detection walk runs server-side on any relationship mutation; mutation rejected if it creates a cycle
+- [x] **DATA-08**: GIN indexes on `spouse_ids`, `parent_ids`, `child_ids` for relationship lookups
+- [x] **DATA-09**: Unique partial index enforces one `is_me=true` person per tree per user
+- [x] **DATA-10**: `people.id` is a UUID generated client-side (`uid()`) and accepted by the server (matches handoff model)
 
 ### Canvas & Rendering
 
@@ -214,17 +214,17 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 | TREE-01 | Phase 1 | Pending |
 | TREE-02 | Phase 1 | Pending |
 | TREE-03 | Phase 1 | Pending |
-| TREE-04 | Phase 1 | Pending |
-| DATA-01 | Phase 1 | Pending |
-| DATA-02 | Phase 1 | Pending |
-| DATA-03 | Phase 1 | Pending |
-| DATA-04 | Phase 1 | Pending |
-| DATA-05 | Phase 1 | Pending |
-| DATA-06 | Phase 1 | Pending |
-| DATA-07 | Phase 1 | Pending |
-| DATA-08 | Phase 1 | Pending |
-| DATA-09 | Phase 1 | Pending |
-| DATA-10 | Phase 1 | Pending |
+| TREE-04 | Phase 1 | Complete |
+| DATA-01 | Phase 1 | Complete |
+| DATA-02 | Phase 1 | Complete |
+| DATA-03 | Phase 1 | Complete |
+| DATA-04 | Phase 1 | Complete |
+| DATA-05 | Phase 1 | Complete |
+| DATA-06 | Phase 1 | Complete |
+| DATA-07 | Phase 1 | Complete |
+| DATA-08 | Phase 1 | Complete |
+| DATA-09 | Phase 1 | Complete |
+| DATA-10 | Phase 1 | Complete |
 | DESIGN-03 | Phase 1 | Complete |
 | DEP-02 | Phase 1 | Complete |
 | CANV-01 | Phase 2 | Pending |

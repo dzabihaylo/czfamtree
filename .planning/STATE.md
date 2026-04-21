@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-21T19:01:46.417Z"
+last_updated: "2026-04-21T15:34:00Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
-  percent: 25
+  completed_plans: 2
+  percent: 50
 ---
 
 # STATE: CZ Family Tree
 
-**Last updated:** 2026-04-21 (after plan 01-01 execution)
+**Last updated:** 2026-04-21 (after plan 01-02 execution)
 
 ## Project Reference
 
@@ -26,19 +26,19 @@ progress:
 ## Current Position
 
 Phase: 01 (foundation) — EXECUTING
-Plan: 1 of 4 complete; next is 01-02
+Plan: 2 of 4 complete; next is 01-03
 
 - **Milestone:** v1 Launch
 - **Phase:** 01 — Foundation (executing)
-- **Plan:** 01-01 complete (scaffold + Clerk + Supabase + tokens + Zustand); 01-02 next (schema + RLS + bootstrap_tree RPC)
+- **Plan:** 01-01 + 01-02 complete (scaffold + Clerk + Supabase + tokens + Zustand + cloud-applied schema + RLS + typed Database generic); 01-03 next (Clerk sign-in/sign-up pages + bootstrap server action + root redirect)
 - **Status:** Executing Phase 01
-- **Progress:** [█░░░░░░░░░] 1 / 4 plans of Phase 1 done · 0 / 5 phases complete
+- **Progress:** [█████░░░░░] 2 / 4 plans of Phase 1 done · 0 / 5 phases complete
 
 ### Roadmap Overview
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| 1. Foundation | Signed-in user lands in own private tree with schema + RLS correct | Executing (1/4 plans done) |
+| 1. Foundation | Signed-in user lands in own private tree with schema + RLS correct | Executing (2/4 plans done) |
 | 2. Canvas, Nodes & Edit | Pan/zoom canvas, PersonNode, SidePanel, trustworthy auto-save | Not started |
 | 3. Authoring & History | Radial-add, undo/redo, toolbar, toasts, search, a11y | Not started |
 | 4. Tidy & Layout | Dagre couple-merge layout with animated transition | Not started |
@@ -87,17 +87,18 @@ None currently. User approval of the roadmap is the only gate to beginning Phase
 
 ### Last Session
 
-- Executed Phase 1 Plan 01 (`/gsd-execute-phase 1`)
-  - Scaffolded Next 16 + React 19 + TS 6 + Tailwind v4 with exact-pinned deps (2b7e54e)
-  - Wired Clerk 7 middleware + Supabase-js factories (server/browser) + auth helpers + cn util (73f0e3f)
-  - Mapped handoff OKLCH tokens into Tailwind v4 @theme + root layout with ClerkProvider + Inter/Mono fonts (81abb33)
-  - Added Zustand 5 + zundo 2 + immer 11 store factory with SSR-safe TreeStoreProvider (bd77062)
-  - Duration: ~10 min · 4 tasks · 18 files created · 4 auto-fix deviations (all blocking dependency issues — logged in 01-01-SUMMARY.md)
-  - `npm run build` and `tsc --noEmit` both green after completion
+- Executed Phase 1 Plan 02 (`/gsd-execute-phase 1`) — Task 1 + Task 2
+  - Task 1 (prior session, commit `aa89764`): wrote `supabase/migrations/20260421000000_initial_schema.sql` (4 tables, 4 enums, CHECK constraints, GIN indexes, unique partial index, 16 RLS policies all with `(select auth.jwt()->>'sub')` wrapping, FORCE RLS on all tables, `user_tree_ids()` SECURITY DEFINER helper, `creates_parent_cycle()` cycle detector, `bootstrap_tree()` RPC with in-body sanity check) + `supabase/seed.sql`
+  - User ran `supabase db push` — migration applied successfully to Supabase project `nlnumavvjjgcdpwuziui` (czfamtree); pgcrypto NOTICE skipped
+  - Task 2 (this session, commit `be3e552`): regenerated `lib/supabase/types.ts` from live cloud schema (381 lines, `Database` generic with 4 Tables + 4 Enums + 3 Functions); upgraded `lib/supabase/server.ts` and `lib/supabase/browser.ts` to `createClient<Database>(...)`; wrote `tests/rls.spec.ts` with 3 env-gated smoke tests
+  - `npx tsc --noEmit` passes clean
+  - Duration: ~35 min total (Task 1 ~25 min prior, Task 2 ~12 min this session)
+  - No deviations in Task 2 — plan executed as written
+  - Deferred: RLS smoke test EXECUTION — `.env.local` not yet populated. Suite is written, typechecks, gated on env vars; runs as soon as user fills in Clerk + Supabase anon keys.
 
 ### Next Session
 
-Run `/gsd-execute-phase 1` again to execute Plan 01-02 (DB schema + RLS + `bootstrap_tree` RPC + generated types + RLS smoke test). Plan 01-02 is blocking for plans 01-03 and 01-04. Before executing, user must populate `.env.local` with Clerk + Supabase keys (see 01-01-SUMMARY.md → "User Setup Required").
+Run `/gsd-execute-phase 1` again to execute Plan 01-03 (Clerk SignIn/SignUp pages + split-50/50 auth layout + SVG illustration + bootstrap server action + root redirect). Plan 01-03 imports the `Database` generic from `lib/supabase/types.ts` and calls the `bootstrap_tree` RPC. Plan 01-04 (authenticated shell) can run after 01-03. Before executing, user should populate `.env.local` so RLS smoke test can be run manually with `npx dotenv-cli -e .env.local -- npx vitest run tests/rls.spec.ts` (expected: 3 pass).
 
 ### Context Notes
 
