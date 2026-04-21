@@ -28,9 +28,13 @@ A person can open the app, see their family laid out on a clean canvas, and add/
 - [ ] Undo/redo (⌘Z / ⌘⇧Z), full-state history
 - [ ] Bottom floating toolbar (undo, redo, zoom, fit, Tidy, panel toggle)
 - [ ] Toast messages for structural actions
-- [ ] Tidy layout button using `dagre` (couples-as-merged-nodes)
+- [ ] Tidy layout button using `@dagrejs/dagre` (couples-as-merged-nodes)
 - [ ] Share modal: invite by email (Editor/Viewer), manage invitees, link-sharing toggle
-- [ ] Live presence + real-time edit broadcast (Supabase Realtime)
+- [ ] Live presence (avatar stack) + live cursors + real-time edit broadcast (Supabase Realtime)
+- [ ] ⌘K / ⌘F search palette to jump to a person by name
+- [ ] Delete-person confirmation dialog (destructive action, shared tree)
+- [ ] Error / disconnect banner when realtime or save fails
+- [ ] Basic accessibility: focus rings, ARIA labels on all controls, Tab-cycle into the canvas
 - [ ] Persistence to Supabase Postgres with RLS
 - [ ] Pixel-parity with the handoff design tokens (colors, typography, spacing, radii, shadows)
 - [ ] Deployed to Vercel
@@ -38,11 +42,15 @@ A person can open the app, see their family laid out on a clean canvas, and add/
 ### Out of Scope (v1)
 
 - **Google Sheets sync drawer** — handoff step 9, deferred to v2. UI design is complete but API/OAuth work is not worth v1 scope.
-- **Full accessibility pass for canvas keyboard nav** — arrow-key traversal between nodes, radial screen-reader labels. v1 ships with the fundamentals (Enter/Esc/⌘Z), full a11y is v2.
+- **Arrow-key canvas traversal between nodes** — v1 ships focus rings + ARIA + Enter/Esc/⌘Z. Arrow-key sibling/generation traversal is v2.
 - **CRDT conflict resolution** — last-write-wins per field is sufficient for v1 (family trees have very low concurrent-edit pressure).
 - **Public link-viewable trees beyond the Share-modal toggle** — no SEO-indexed public pages.
 - **Mobile-optimized canvas interactions** — desktop-first; mobile gets a usable but not polished experience.
-- **Import/export (GEDCOM, CSV)** — would broaden scope too much for v1.
+- **Import/export (GEDCOM, CSV)** — pulls the product into the "Ancestry competitor" category it explicitly rejects. Stay canvas-first.
+- **DNA / record hints / Smart Matches / shared-world tree / source citations / fan/pedigree chart views** — anti-features. These are the features of a genealogy database, not a canvas tool. Building any of them would contradict the Core Value.
+- **Photo upload per person** — deferred to v1.x. Avatar initials only in v1 to stay focused on the canvas loop.
+- **Right-click context menu** — deferred to v1.x. Radial menu + side panel cover v1 needs.
+- **Comments / threaded discussion on nodes** — out of scope; would push the product toward FigJam and away from "focused canvas tool".
 
 ## Context
 
@@ -53,26 +61,32 @@ A person can open the app, see their family laid out on a clean canvas, and add/
 
 ## Constraints
 
-- **Tech stack**: Next.js 14 App Router + TypeScript + Tailwind — matches handoff suggestion, good Vercel fit.
-- **Auth**: Clerk — fastest path to Google/Apple/email, good UX out of box.
+- **Tech stack**: Next.js 16 App Router + React 19 + TypeScript + Tailwind v4 — Clerk 7 (current Core 3) requires Next 16 / React 19; staying on Next 14 forces legacy Clerk 5.
+- **Auth**: Clerk 7 + Supabase native third-party auth (NOT the deprecated JWT template). RLS uses `auth.jwt()->>'sub'` (Clerk userId is a text string, not a UUID — `auth.uid()` does NOT work).
 - **Database**: Supabase Postgres with Row Level Security + Realtime — one vendor for persistence and presence.
-- **Layout library**: `dagre` — handoff's first suggestion, supports marriage-aware layout via couple-node merging.
+- **Layout library**: `@dagrejs/dagre@3.x` (NOT the unscoped `dagre` frozen at 0.8.5). Couples-as-merged-nodes pattern, children as edges from the couple-node.
+- **State management**: Zustand 5 + `zundo` temporal middleware + `immer` — replaces the prototype's hand-rolled history array. Store factory + Context Provider (never module-scoped, SSR would leak).
 - **Testing**: Vitest (unit for `model.ts`: edges, layout, mutations) + Playwright (E2E for canvas flows).
-- **Deployment**: Vercel — native Next.js hosting.
-- **Design fidelity**: Pixel-parity with handoff tokens defined in `styles.css` (colors, typography, spacing, radii, shadow). No visual drift.
+- **Deployment**: Vercel — native Next.js hosting. Pin Next.js to a post-CVE-2025-29927 release (≥14.2.25 / ≥15.2.3 / Next 16 already safe).
+- **Design fidelity**: Pixel-parity with handoff tokens defined in `styles.css` (colors, typography, spacing, radii, shadow). Tailwind v4 `@theme` block maps the handoff's `:root` CSS variables 1:1.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Next.js 14 App Router + TS + Tailwind | Matches handoff suggestion; Vercel-native; server components for tree data fetch | — Pending |
-| Clerk for auth | Google/Apple/email in minutes; matches sign-in design (3 buttons, no form) | — Pending |
+| Next.js 16 App Router + React 19 + TS + Tailwind v4 | Clerk 7 requires Next 16 / React 19; Tailwind v4 `@theme` maps handoff CSS vars 1:1 | — Pending |
+| Clerk 7 + Supabase native third-party auth | JWT template deprecated 2025-04-01; native integration is current best practice | — Pending |
 | Supabase Postgres + RLS + Realtime | One vendor for persistence + live presence; RLS maps cleanly to tree sharing | — Pending |
-| `dagre` for graph layout | Handoff's first suggestion; marriage-aware via merged couple-nodes | — Pending |
+| `@dagrejs/dagre@3.x` for graph layout | Scoped package is maintained; unscoped `dagre` is frozen at 0.8.5 | — Pending |
+| Zustand + zundo + immer | Purpose-built for the handoff's history pattern; replaces hand-rolled snapshot array | — Pending |
+| Custom CSS transform for pan/zoom (no library) | Library options (`react-zoom-pan-pinch`, React Flow) fight the handoff's `translate(x,y) scale(k)` wrapper model; ~120 LOC custom is the right path | — Pending |
 | Ship handoff steps 1–8 as v1 (Share included) | Share modal makes the app feel collaborative from day one; Sheets sync deferred | — Pending |
-| Live presence in v1 | Supabase Realtime is cheap to add once DB is live; raises perceived quality | — Pending |
+| Live presence + live cursors in v1 | Supabase Realtime supports both cheaply; avatar stack alone under-delivers on the multiplayer promise | — Pending |
 | Edges derived, not stored | Per handoff: `computeEdges(people)` — single source of truth in relationship arrays | — Pending |
+| Relationships as arrays on `people` (not a join table) | Matches handoff TS contract; simpler writes; GIN-indexable. Revisit in v2 if typed/time-bounded relationships needed | — Pending |
 | Last-write-wins per field | CRDT is overkill for family-tree concurrency patterns | — Pending |
+| Optimistic-local, authoritative-server, reconcile-via-Realtime | Clients broadcast; server writes don't feed back through Postgres CDC (RLS-per-row too costly) | — Pending |
+| One Realtime channel per tree (`tree:${treeId}`) | Presence + broadcast multiplexed; throttle drag to ~30Hz, debounce field edits to 250–500ms | — Pending |
 
 ## Evolution
 
