@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-21T15:34:00Z"
+last_updated: "2026-04-21T19:34:07.029Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
-  percent: 50
+  completed_plans: 3
+  percent: 75
 ---
 
 # STATE: CZ Family Tree
 
-**Last updated:** 2026-04-21 (after plan 01-02 execution)
+**Last updated:** 2026-04-21 (after plan 01-03 execution)
 
 ## Project Reference
 
@@ -26,19 +26,19 @@ progress:
 ## Current Position
 
 Phase: 01 (foundation) — EXECUTING
-Plan: 2 of 4 complete; next is 01-03
+Plan: 3 of 4 complete; next is 01-04
 
 - **Milestone:** v1 Launch
 - **Phase:** 01 — Foundation (executing)
-- **Plan:** 01-01 + 01-02 complete (scaffold + Clerk + Supabase + tokens + Zustand + cloud-applied schema + RLS + typed Database generic); 01-03 next (Clerk sign-in/sign-up pages + bootstrap server action + root redirect)
+- **Plan:** 01-01 + 01-02 + 01-03 complete (scaffold + Clerk + Supabase + tokens + Zustand + cloud-applied schema + RLS + typed Database generic + Clerk sign-in/sign-up pages + split-50/50 auth shell + decorative SVG + bootstrap server action + root redirect); 01-04 next (authenticated shell + `/tree/[treeId]` route)
 - **Status:** Executing Phase 01
-- **Progress:** [█████░░░░░] 2 / 4 plans of Phase 1 done · 0 / 5 phases complete
+- **Progress:** [████████░░] 75%
 
 ### Roadmap Overview
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| 1. Foundation | Signed-in user lands in own private tree with schema + RLS correct | Executing (2/4 plans done) |
+| 1. Foundation | Signed-in user lands in own private tree with schema + RLS correct | Executing (3/4 plans done) |
 | 2. Canvas, Nodes & Edit | Pan/zoom canvas, PersonNode, SidePanel, trustworthy auto-save | Not started |
 | 3. Authoring & History | Radial-add, undo/redo, toolbar, toasts, search, a11y | Not started |
 | 4. Tidy & Layout | Dagre couple-merge layout with animated transition | Not started |
@@ -55,6 +55,14 @@ Baseline targets (tracked once implementation begins):
 | Auto-save round-trip (field edit → server ACK → pill green) | < 500ms on broadband | — |
 | Cursor broadcast throttle | ≤ 100ms (Supabase sweet spot) | — |
 | Undo memory after 500 edits | < 50MB heap | — |
+
+### Plan execution metrics
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| 01-01 | 10min | 4 | 18 |
+| 01-02 | 35min | 2 | 6 |
+| 01-03 | 20min | 3 | 6 created + 1 modified |
 
 ## Accumulated Context
 
@@ -87,18 +95,18 @@ None currently. User approval of the roadmap is the only gate to beginning Phase
 
 ### Last Session
 
-- Executed Phase 1 Plan 02 (`/gsd-execute-phase 1`) — Task 1 + Task 2
-  - Task 1 (prior session, commit `aa89764`): wrote `supabase/migrations/20260421000000_initial_schema.sql` (4 tables, 4 enums, CHECK constraints, GIN indexes, unique partial index, 16 RLS policies all with `(select auth.jwt()->>'sub')` wrapping, FORCE RLS on all tables, `user_tree_ids()` SECURITY DEFINER helper, `creates_parent_cycle()` cycle detector, `bootstrap_tree()` RPC with in-body sanity check) + `supabase/seed.sql`
-  - User ran `supabase db push` — migration applied successfully to Supabase project `nlnumavvjjgcdpwuziui` (czfamtree); pgcrypto NOTICE skipped
-  - Task 2 (this session, commit `be3e552`): regenerated `lib/supabase/types.ts` from live cloud schema (381 lines, `Database` generic with 4 Tables + 4 Enums + 3 Functions); upgraded `lib/supabase/server.ts` and `lib/supabase/browser.ts` to `createClient<Database>(...)`; wrote `tests/rls.spec.ts` with 3 env-gated smoke tests
-  - `npx tsc --noEmit` passes clean
-  - Duration: ~35 min total (Task 1 ~25 min prior, Task 2 ~12 min this session)
-  - No deviations in Task 2 — plan executed as written
-  - Deferred: RLS smoke test EXECUTION — `.env.local` not yet populated. Suite is written, typechecks, gated on env vars; runs as soon as user fills in Clerk + Supabase anon keys.
+- Executed Phase 1 Plan 03 (`/gsd-execute-phase 1`) — 3 tasks, linear, no deviations
+  - Task 1 (commit `29885d6`): created `app/(auth)/layout.tsx` split-50/50 auth shell (brand + `Every name, a branch.`/`Every branch, a story.` headline + UI-SPEC sub-headline without Google Sheet clause + foot) and `components/auth/SignInIllustration.tsx` (verbatim SVG mini-tree from handoff login.jsx L60-123 with OKLCH literals, GEN 01/02 labels, `fig. 01 — the Chan-Zabihaylo family` caption, static `3 editors online` presence)
+  - Task 2 (commit `55a962f`): created `app/(auth)/sign-in/[[...sign-in]]/page.tsx` with Clerk `<SignIn />` + full appearance block (variables: OKLCH tokens + 0px borderRadius + Inter + weight-600-as-medium; elements: Swiss card with 4px hard shadow, translate-on-hover social buttons, hidden Clerk default header; layout: blockButton variant + top placement → 3-button vertical stack). Mirror at `app/(auth)/sign-up/[[...sign-up]]/page.tsx`.
+  - Task 3 (commit `c471cfa`): created `app/actions/bootstrap.ts` (`'use server'` → `getUserIdOrThrow()` defense-in-depth → SELECT `tree_members` → fall through to `supabase.rpc('bootstrap_tree', {p_owner_user_id, p_tree_name: 'My family tree', p_seed_person_name: profile?.displayName ?? 'You'})`), `app/page.tsx` RSC with `dynamic = 'force-dynamic'` redirecting to `/tree/{id}`, and appended `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in` + `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up` to `.env.local.example`
+  - `npx tsc --noEmit` clean; `npm run build` succeeded with 4 routes: `/`, `/_not-found`, `/sign-in/[[...sign-in]]`, `/sign-up/[[...sign-up]]`
+  - Duration: ~20 min
+  - Deferred: visual render verification (requires populated `.env.local` + `npm run dev`); end-to-end OAuth round-trip (same prerequisite + Clerk Dashboard provider config)
+  - AUTH-04 gap: Clerk `appearance` reaches ~80% pixel-parity; remaining 20% (hardcoded "OR" divider, possibly-overridden hover transform, un-reorderable email-vs-social sections) is ACCEPTED per RESEARCH.md §11 — not chased further
 
 ### Next Session
 
-Run `/gsd-execute-phase 1` again to execute Plan 01-03 (Clerk SignIn/SignUp pages + split-50/50 auth layout + SVG illustration + bootstrap server action + root redirect). Plan 01-03 imports the `Database` generic from `lib/supabase/types.ts` and calls the `bootstrap_tree` RPC. Plan 01-04 (authenticated shell) can run after 01-03. Before executing, user should populate `.env.local` so RLS smoke test can be run manually with `npx dotenv-cli -e .env.local -- npx vitest run tests/rls.spec.ts` (expected: 3 pass).
+Run `/gsd-execute-phase 1` again to execute Plan 01-04 (authenticated shell: topbar + `/tree/[treeId]` route + seed PersonNode + tree rename + tree switcher + user menu). Plan 01-04 consumes `resolveOrBootstrapTree()` from `app/actions/bootstrap.ts` for the "+ New tree" switcher action, renders the seeded "You" person from the RPC-created people row, and lands the final piece of Phase 01. Before the E2E sign-in flow works, user must populate `.env.local` (Clerk pk/sk + Supabase URL/key + the 2 new NEXT_PUBLIC_CLERK_SIGN_IN_URL / SIGN_UP_URL route hints — defaults are in `.env.local.example`).
 
 ### Context Notes
 

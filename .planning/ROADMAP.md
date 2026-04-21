@@ -36,7 +36,7 @@ Milestone outcome: a user signs in with Google/Apple/email, lands in their tree,
 Plans:
 - [x] 01-01-PLAN.md — Infrastructure scaffolding (Next 16 + Clerk + Supabase client factories + Tailwind v4 tokens + fonts)
 - [x] 01-02-PLAN.md — Database schema + RLS + `bootstrap_tree` RPC + generated types + RLS smoke test [BLOCKING: supabase db push]
-- [ ] 01-03-PLAN.md — Clerk SignIn + SignUp pages + split-50/50 auth layout + SVG illustration + bootstrap server action + root redirect
+- [x] 01-03-PLAN.md — Clerk SignIn + SignUp pages + split-50/50 auth layout + SVG illustration + bootstrap server action + root redirect
 - [ ] 01-04-PLAN.md — Authenticated shell: topbar (brand + TreeTitle + TreeSwitcher + UserMenu) + tree route + SeedPersonNode + EmptyTreeOverlay + AuthError + Playwright E2E
 **UI hint:** yes
 **Research flags:** Step-relations data model decision must be resolved during phase planning before schema freeze — the `parent_ids` array (max 2) is a biologically-inspired choice that cannot represent step/adoptive parents beyond two. Planning must explicitly choose: (a) accept the limitation and document workaround for v1, or (b) promote parent-child to a `relationships(tree_id, a_id, b_id, kind, lineage_type)` table before DATA-06 is frozen. Per PITFALLS #19 and SUMMARY gaps.

@@ -7,10 +7,10 @@
 
 ### Authentication & Tree Ownership
 
-- [ ] **AUTH-01**: User can sign in with Google via Clerk
-- [ ] **AUTH-02**: User can sign in with Apple via Clerk
-- [ ] **AUTH-03**: User can sign in with email (magic link or code) via Clerk
-- [ ] **AUTH-04**: Sign-in screen matches handoff design pixel-for-pixel (split layout, cream backgrounds, 3-button stack, static illustration)
+- [x] **AUTH-01**: User can sign in with Google via Clerk
+- [x] **AUTH-02**: User can sign in with Apple via Clerk
+- [x] **AUTH-03**: User can sign in with email (magic link or code) via Clerk
+- [x] **AUTH-04**: Sign-in screen matches handoff design pixel-for-pixel (split layout, cream backgrounds, 3-button stack, static illustration)
 - [x] **AUTH-05**: Authenticated session persists across browser refresh
 - [ ] **AUTH-06**: User can sign out from the user menu
 - [ ] **TREE-01**: On first sign-in, user auto-lands in a freshly created empty tree with a seed "You" node
@@ -205,10 +205,10 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Pending |
 | TREE-01 | Phase 1 | Pending |
