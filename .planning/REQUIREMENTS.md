@@ -201,17 +201,131 @@ Explicit exclusions. These contradict Core Value or push the product into the wr
 
 ## Traceability
 
-Mapped during roadmap creation.
+Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals and success criteria.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Populated by /gsd-plan-phase workflow) | — | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Pending |
+| TREE-01 | Phase 1 | Pending |
+| TREE-02 | Phase 1 | Pending |
+| TREE-03 | Phase 1 | Pending |
+| TREE-04 | Phase 1 | Pending |
+| DATA-01 | Phase 1 | Pending |
+| DATA-02 | Phase 1 | Pending |
+| DATA-03 | Phase 1 | Pending |
+| DATA-04 | Phase 1 | Pending |
+| DATA-05 | Phase 1 | Pending |
+| DATA-06 | Phase 1 | Pending |
+| DATA-07 | Phase 1 | Pending |
+| DATA-08 | Phase 1 | Pending |
+| DATA-09 | Phase 1 | Pending |
+| DATA-10 | Phase 1 | Pending |
+| DESIGN-03 | Phase 1 | Pending |
+| DEP-02 | Phase 1 | Pending |
+| CANV-01 | Phase 2 | Pending |
+| CANV-02 | Phase 2 | Pending |
+| CANV-03 | Phase 2 | Pending |
+| CANV-04 | Phase 2 | Pending |
+| CANV-05 | Phase 2 | Pending |
+| CANV-06 | Phase 2 | Pending |
+| NODE-01 | Phase 2 | Pending |
+| NODE-02 | Phase 2 | Pending |
+| NODE-03 | Phase 2 | Pending |
+| NODE-04 | Phase 2 | Pending |
+| NODE-05 | Phase 2 | Pending |
+| NODE-06 | Phase 2 | Pending |
+| EDGE-01 | Phase 2 | Pending |
+| EDGE-02 | Phase 2 | Pending |
+| EDGE-03 | Phase 2 | Pending |
+| EDGE-04 | Phase 2 | Pending |
+| EDGE-05 | Phase 2 | Pending |
+| EDGE-06 | Phase 2 | Pending |
+| SEL-01 | Phase 2 | Pending |
+| SEL-02 | Phase 2 | Pending |
+| SEL-03 | Phase 2 | Pending |
+| PANEL-01 | Phase 2 | Pending |
+| PANEL-02 | Phase 2 | Pending |
+| PANEL-03 | Phase 2 | Pending |
+| PANEL-04 | Phase 2 | Pending |
+| PANEL-05 | Phase 2 | Pending |
+| PANEL-06 | Phase 2 | Pending |
+| PANEL-07 | Phase 2 | Pending |
+| PANEL-08 | Phase 2 | Pending |
+| PANEL-09 | Phase 2 | Pending |
+| SAVE-01 | Phase 2 | Pending |
+| SAVE-02 | Phase 2 | Pending |
+| SAVE-03 | Phase 2 | Pending |
+| SAVE-04 | Phase 2 | Pending |
+| ERR-01 | Phase 2 | Pending |
+| DESIGN-01 | Phase 2 | Pending |
+| DESIGN-02 | Phase 2 | Pending |
+| RAD-01 | Phase 3 | Pending |
+| RAD-02 | Phase 3 | Pending |
+| RAD-03 | Phase 3 | Pending |
+| ADD-01 | Phase 3 | Pending |
+| ADD-02 | Phase 3 | Pending |
+| ADD-03 | Phase 3 | Pending |
+| ADD-04 | Phase 3 | Pending |
+| HIST-01 | Phase 3 | Pending |
+| HIST-02 | Phase 3 | Pending |
+| HIST-03 | Phase 3 | Pending |
+| HIST-04 | Phase 3 | Pending |
+| HIST-05 | Phase 3 | Pending |
+| TOOL-01 | Phase 3 | Pending |
+| TOOL-02 | Phase 3 | Pending |
+| TOAST-01 | Phase 3 | Pending |
+| SRCH-01 | Phase 3 | Pending |
+| SRCH-02 | Phase 3 | Pending |
+| A11Y-01 | Phase 3 | Pending |
+| A11Y-02 | Phase 3 | Pending |
+| A11Y-03 | Phase 3 | Pending |
+| TIDY-01 | Phase 4 | Pending |
+| TIDY-02 | Phase 4 | Pending |
+| TIDY-03 | Phase 4 | Pending |
+| TIDY-04 | Phase 4 | Pending |
+| TIDY-05 | Phase 4 | Pending |
+| SHARE-01 | Phase 5 | Pending |
+| SHARE-02 | Phase 5 | Pending |
+| SHARE-03 | Phase 5 | Pending |
+| SHARE-04 | Phase 5 | Pending |
+| SHARE-05 | Phase 5 | Pending |
+| SHARE-06 | Phase 5 | Pending |
+| SHARE-07 | Phase 5 | Pending |
+| SHARE-08 | Phase 5 | Pending |
+| RT-01 | Phase 5 | Pending |
+| RT-02 | Phase 5 | Pending |
+| RT-03 | Phase 5 | Pending |
+| RT-04 | Phase 5 | Pending |
+| RT-05 | Phase 5 | Pending |
+| RT-06 | Phase 5 | Pending |
+| RT-07 | Phase 5 | Pending |
+| RT-08 | Phase 5 | Pending |
+| RT-09 | Phase 5 | Pending |
+| RT-10 | Phase 5 | Pending |
+| ERR-02 | Phase 5 | Pending |
+| TEST-01 | Phase 5 | Pending |
+| TEST-02 | Phase 5 | Pending |
+| DEP-01 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 86 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 86 (pending roadmap)
+- v1 requirements: 106 total
+- Mapped to phases: 106 (100%)
+- Unmapped: 0
+- Duplicated: 0
+
+**Phase totals:**
+- Phase 1 (Foundation): 22 requirements
+- Phase 2 (Canvas, Nodes & Edit): 37 requirements
+- Phase 3 (Authoring & History): 20 requirements
+- Phase 4 (Tidy & Layout): 5 requirements
+- Phase 5 (Share & Realtime): 22 requirements
 
 ---
 *Requirements defined: 2026-04-21*
-*Last updated: 2026-04-21 after initialization*
+*Traceability populated by /gsd-roadmap: 2026-04-21*
+*Last updated: 2026-04-21 after roadmap creation*
