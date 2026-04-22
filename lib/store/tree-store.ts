@@ -106,10 +106,19 @@ export function createTreeStore() {
         // Setters:
         hydratePeople: (rows) =>
           set((state) => {
+            // Reset per-person state alongside the people replacement so stale
+            // selection / sidepanel / drag / save-status from the previous
+            // tree don't leak into the new tree on TreeSwitcher navigation.
+            // treeId is set separately by the caller (TreeCanvas useEffect).
             state.people = {};
             for (const r of rows) {
               state.people[r.id] = personFromRow(r);
             }
+            state.selectedPersonId = null;
+            state.sidePanelOpen = false;
+            state.draggingPersonId = null;
+            state.dragOrigin = null;
+            state.saveStateByPersonId = {};
           }),
         setTreeId: (id) =>
           set((state) => {
