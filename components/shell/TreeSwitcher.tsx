@@ -66,9 +66,13 @@ export default function TreeSwitcher({ currentTreeId }: TreeSwitcherProps) {
   const handleCreate = useCallback(() => {
     startTransition(async () => {
       const newId = await createNewTree();
-      router.push(`/tree/${newId}`);
-      router.refresh();
       setOpen(false);
+      // router.push is enough — /tree/[treeId] is dynamic='force-dynamic', so
+      // the RSC re-runs on its own. A trailing router.refresh() keeps the
+      // React 19 async transition pending until revalidation completes,
+      // which leaves Next's dev "rendering" indicator stuck and the cursor
+      // spinning after navigation commits.
+      router.push(`/tree/${newId}`);
     });
   }, [router]);
 
