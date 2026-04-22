@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-04-21T19:45:59.087Z"
+status: verifying
+last_updated: "2026-04-22T01:19:29.100Z"
 progress:
   total_phases: 5
   completed_phases: 1
@@ -107,6 +107,7 @@ None currently. User approval of the roadmap is the only gate to beginning Phase
 ### Next Session
 
 Phase 1 is code-complete (4/4 plans, 5 routes built). Ready for verification:
+
 1. User populates `.env.local` with 7 runtime env vars (Clerk pk/sk + Supabase URL/key + Clerk SIGN_IN_URL / SIGN_UP_URL + optional CLERK_JWT_KEY)
 2. User confirms Clerk Dashboard configuration (Google/Apple/email providers enabled, Supabase native third-party auth activated, /sign-in and /sign-up paths registered — per 01-03 SUMMARY Clerk Dashboard table)
 3. User runs `npm run dev` → signs in → verifies 52px topbar + inline tree rename + switcher + avatar menu + seed YOU node + empty-tree greeting
