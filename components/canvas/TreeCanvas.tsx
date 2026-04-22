@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useTreeStore, type PersonRowDb } from '@/lib/store/tree-store';
 import EmptyTreeOverlay from '@/components/shell/EmptyTreeOverlay';
 import PanZoomWrapper from './PanZoomWrapper';
+import SidePanel from './SidePanel';
 
 // The RSC (`app/(app)/tree/[treeId]/page.tsx`) selects only the columns
 // `personFromRow` reads — it omits `created_at`, `tree_id`, `updated_at`
@@ -41,6 +42,8 @@ export default function TreeCanvas({ tree, people }: TreeCanvasProps) {
   const setTreeId = useTreeStore((s) => s.setTreeId);
   const setTransform = useTreeStore((s) => s.setTransform);
   const peopleCount = useTreeStore((s) => Object.keys(s.people).length);
+  const sidePanelOpen = useTreeStore((s) => s.sidePanelOpen);
+  const selectedPersonId = useTreeStore((s) => s.selectedPersonId);
 
   useEffect(() => {
     // `people` is a structural subset of PersonRowDb (omitting columns the
@@ -59,6 +62,7 @@ export default function TreeCanvas({ tree, people }: TreeCanvasProps) {
     <>
       <PanZoomWrapper tree={tree} />
       {peopleCount <= 1 && <EmptyTreeOverlay />}
+      {sidePanelOpen && selectedPersonId && <SidePanel tree={tree} />}
     </>
   );
 }
