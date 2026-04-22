@@ -133,23 +133,46 @@ None currently. User approval of the roadmap is the only gate to beginning Phase
 
 ## Session Continuity
 
-### Last Session
+### Last Session — 2026-04-22 (full Phase 2 execute + verify + quick-fix + Phase 3 planning pause)
 
-- Executed Phase 2 Plan 03 (`/gsd-execute-phase 2`) — 4 tasks, sequential; two Rule-1 acceptance-criterion-alignment deviations (same grep-hygiene pattern as 02-01), zero runtime behavior change
-  - Task 1 (commit `3ddfc56`): created `lib/hooks/useSaveQueue.ts` — per-person serial queue via `useRef<Map<personId, PerPerson>>`, 400ms per-field debounce, pill transitions (idle/saving/saved/error) with 1400ms saved-linger guarded by read-back, `enqueueField`/`enqueueMove`/`flush`/`retry` API, SAVE-04 serial guarantee via runSave finally-chain
-  - Task 2 (commit `535dc77`): created `components/canvas/fields/FieldInput.tsx` (local-mirror + 400ms debounce + onBlur flush, variants text/mono/year), `FieldTextarea.tsx` (same pattern, 4 rows, vertical resize), `GenderSelect.tsx` (3-button segmented, immediate commit, role=radiogroup + role=radio + aria-checked)
-  - Task 3 (commit `58577a2`): created `components/canvas/RelationsList.tsx` (Parents/Spouses/Children middot-separated clickable), `SavePill.tsx` (5-state pill, error renders as button, static dot per D-15), `SidePanel.tsx` (380×viewport aside at top:52, z-[40], full Identity/Life/Relations/Actions/Footer structure, window.confirm-gated Remove hidden for is_me, center-on-person math subtracting PANEL_WIDTH from viewport); mounted `<SidePanel>` in `TreeCanvas.tsx` conditional on `sidePanelOpen && selectedPersonId`
-  - Task 4 (commit `52cba97`): created `components/canvas/SaveErrorToast.tsx` (role=alert + aria-live=assertive, 4400ms auto-dismiss, Retry delegates to queue); hoisted `useSaveQueue` to TreeCanvas and refactored SidePanel to accept `queue: SaveQueue` as prop so the queue survives panel open/close cycles and SaveErrorToast can drive retry from outside the panel
-  - `npx tsc --noEmit` clean; `npx next build` succeeded (5 routes, Compiled successfully in 1678ms); `npx vitest run` 16 passed + 3 skipped (unchanged); all phase-level greps PASS (no dangerouslySetInnerHTML, no temporal/pastStates wiring, no @keyframes/animation in SavePill, no react-hot-toast)
-  - Duration: 8 min
-  - Requirements marked complete: SEL-03, PANEL-01..09, SAVE-01..04, ERR-01, DESIGN-01, DESIGN-02
+**TL;DR:** Phase 2 shipped code-complete, verified automated, HUMAN-UAT persisted but deferred. Quick-task 260422-9vu fixed 3 runtime bugs discovered at smoke-test. Phase 3 planning started but paused at UI-SPEC gate per user direction.
 
-### Next Session
+**Read `.planning/HANDOFF.md` for the full session handoff before running any command.**
 
-**Phase 2 is complete.** 02-01 (data plumbing) + 02-02 (canvas render) + 02-03 (save pipeline + side panel) shipped a full interactive canvas: pan/zoom/drag/Escape, PersonNode with selection + is-me YOU ribbon + selected-only `+` button (Phase 3 handoff), EdgeLayer single-SVG, SidePanel with full edit + remove + relations + center + save pipeline.
+- **Phase 2 execution** (3 waves sequential; worktree isolation fell back to sequential due to macOS case-insensitive path quirk — see HANDOFF.md):
+  - Wave 1 / 02-01 — data plumbing: Zod schema, Server Actions, computeEdges, Zustand store extension, CSS tokens (commits `7415f7b`..`d101b7f`)
+  - Wave 2 / 02-02 — canvas render: PanZoomWrapper, EdgeLayer single-SVG, PersonNode, AvatarCircle, TreeStoreProvider (commits `d9f784d`..`951bba7`)
+  - Wave 3 / 02-03 — save pipeline + SidePanel: useSaveQueue, field primitives, SavePill, SaveErrorToast (commits `3ddfc56`..`366639f`)
+- **Code review** (`02-REVIEW.md`, commit `7ee1b8c`): 0 critical, 6 warning, 5 info. Top issue: WR-01 literal `\u2014` in JSX text across SidePanel/SavePill/SaveErrorToast. Run `/gsd-code-review-fix 02` when ready.
+- **Phase verification** (`02-VERIFICATION.md`): status `human_needed`. 7/7 automated must-haves pass, 37/37 requirements accounted for. 10 HUMAN-UAT items persisted to `02-HUMAN-UAT.md` (commit `e712bd4`) — all pending browser testing.
+- **Quick task 260422-9vu** — three bug fixes found during smoke-test:
+  - Zustand unstable selectors (`Object.keys(s.people)`) → infinite loop. Fixed with `useShallow` in PanZoomWrapper, restructured TreeCanvas to derive count outside selector (commit `eb5ca59`).
+  - TreeSwitcher `handleCreate` called `router.refresh()` after `router.push()` in a React 19 async `startTransition` — left transition permanently pending, Next "rendering" indicator stuck, cursor spinning. Dropped the `refresh()` (commit `340d786`).
+  - `hydratePeople` didn't reset `selectedPersonId` / `sidePanelOpen` / `draggingPersonId` / `dragOrigin` / `saveStateByPersonId` — stale per-person state leaked across tree switches. Reset all of them in the same set() (commit `0c9549c`).
+- **Phase 3 planning paused** at the UI-SPEC gate. User chose **path B — full pipeline** (`/gsd-ui-phase 3` → `/gsd-discuss-phase 3` → `/gsd-plan-phase 3` → `/gsd-execute-phase 3`). Empty `.planning/phases/03-authoring-history/` created.
 
-1. **Phase 2 verification:** cross-user RLS isolation check on people mutations (`updatePerson` / `removePerson` under a shared tree as editor vs viewer — viewer should fail). Requires a two-account live session; flagged for the verifier agent.
-2. **Phase 3 planning target** — Authoring & History: radial-add menu wired to the PersonNode `+` button (currently a no-op logging `[Phase 3] radial open for {id}`), undo/redo via zundo wired to drag + edit setters (HIST-01..05 — `pastStates.push` currently NOT invoked per D-06), toolbar with Undo/Redo/Fit/Tidy/Share buttons, search, a11y audit.
+**User feedback about Phase 2 boundary:** the phase shipped a skeleton — canvas visible but no way to add anyone, "Getting Started" overlay undismissable, `+` button a no-op (Phase 3 wire-up). User said *"this doesn't feel like progress."* Apply in future phases: flag boundaries that don't enable a user loop BEFORE declaring completion, measure "done" by what the user can do not what tests pass, and name trade-offs explicitly. See HANDOFF.md for more detail.
+
+### Next Session — run this exact command first
+
+```
+/gsd-ui-phase 3
+```
+
+Then (top-level, NOT nested — TUI prompts break in nested Task calls):
+
+```
+/gsd-discuss-phase 3
+/gsd-plan-phase 3
+/gsd-execute-phase 3
+```
+
+Phase 3 must ship radial-add (RAD-01..03 + ADD-01..04) before Phase 2 HUMAN-UAT becomes testable — most UAT items need a 2+ person tree.
+
+**Do not:**
+- Try to finish Phase 2 HUMAN-UAT in the next session. It's blocked by Phase 3.
+- Auto-chain the three TUI commands above — they must run at the top level.
+- Fix the 6 `02-REVIEW.md` warnings in the same session as Phase 3 planning. Keep polish separate.
 
 ### Context Notes
 
