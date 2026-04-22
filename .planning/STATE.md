@@ -125,6 +125,12 @@ Baseline targets (tracked once implementation begins):
 
 None currently. User approval of the roadmap is the only gate to beginning Phase 1 planning.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260422-9vu | Fix Zustand unstable-selector bug + TreeSwitcher router.refresh hang + hydratePeople cross-tree leak | 2026-04-22 | 0c9549c | [260422-9vu-fix-zustand-unstable-selector-bug-wrap-o](./quick/260422-9vu-fix-zustand-unstable-selector-bug-wrap-o/) |
+
 ## Session Continuity
 
 ### Last Session
