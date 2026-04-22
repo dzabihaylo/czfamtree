@@ -192,3 +192,25 @@ export function useTreeStore<T>(selector: (state: TreeState) => T): T {
   }
   return useStore(store, selector);
 }
+
+/**
+ * Returns the raw Zustand StoreApi instance scoped to this Provider tree.
+ *
+ * Use this when you need `store.getState()` for an imperative read inside an
+ * event handler or window listener — e.g. PanZoomWrapper's mouseup reads the
+ * final dragged position via `storeApi.getState().people[id]` rather than
+ * capturing a selector value through the closure (which would go stale
+ * across the window listener lifetime).
+ *
+ * This is a carry-in from Plan 01: the plan originally scoped this helper
+ * to 01-01 but the Phase 2 drag-save pipeline (Plan 02) is the first
+ * consumer, so it landed here in Plan 02-02 Task 3. Plan 03's useSaveQueue
+ * will also consume it.
+ */
+export function useTreeStoreApi(): TreeStoreApi {
+  const store = useContext(TreeStoreContext);
+  if (!store) {
+    throw new Error('useTreeStoreApi must be used inside <TreeStoreProvider>');
+  }
+  return store;
+}
