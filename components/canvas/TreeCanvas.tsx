@@ -43,7 +43,15 @@ export default function TreeCanvas({ tree, people }: TreeCanvasProps) {
   const hydratePeople = useTreeStore((s) => s.hydratePeople);
   const setTreeId = useTreeStore((s) => s.setTreeId);
   const setTransform = useTreeStore((s) => s.setTransform);
-  const peopleCount = useTreeStore((s) => Object.keys(s.people).length);
+  // Subscribe to the stable `people` record reference and derive the count
+  // outside the selector — avoids the per-render Object.keys allocation that
+  // trips React's "getServerSnapshot should be cached" warning under
+  // useSyncExternalStore. Record identity only changes on hydrate / add /
+  // remove, so this selector is cheap and stable. Named `peopleById` to
+  // avoid collision with the `people: TreeCanvasPersonRow[]` prop (the
+  // RSC-fetched array is a different shape from the store's keyed record).
+  const peopleById = useTreeStore((s) => s.people);
+  const peopleCount = Object.keys(peopleById).length;
   const sidePanelOpen = useTreeStore((s) => s.sidePanelOpen);
   const selectedPersonId = useTreeStore((s) => s.selectedPersonId);
 

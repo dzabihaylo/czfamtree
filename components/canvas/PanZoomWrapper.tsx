@@ -8,6 +8,7 @@ import {
   type MutableRefObject,
 } from 'react';
 import { useTreeStore, useTreeStoreApi } from '@/lib/store/tree-store';
+import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils/cn';
 import { movePerson } from '@/app/actions/people';
 import EdgeLayer from './EdgeLayer';
@@ -102,7 +103,12 @@ export default function PanZoomWrapper({ tree }: PanZoomWrapperProps) {
   const setDragging = useTreeStore((s) => s.setDragging);
   const setPersonPosition = useTreeStore((s) => s.setPersonPosition);
   const setSaveState = useTreeStore((s) => s.setSaveState);
-  const peopleIds = useTreeStore((s) => Object.keys(s.people));
+  // useShallow stabilises the array reference across renders — Object.keys()
+  // returns a freshly-allocated array each call, which Zustand 5's default
+  // Object.is equality treats as a changed snapshot and loops forever. The
+  // shallow comparator diffs element-wise, so the array identity only
+  // changes when the person-id set actually changes.
+  const peopleIds = useTreeStore(useShallow((s) => Object.keys(s.people)));
 
   // Raw store API for imperative reads inside window listeners — avoids
   // stale closures on transform.k, people[id], and saveStateByPersonId.
