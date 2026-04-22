@@ -79,9 +79,9 @@ function styleFor(state: SaveState): Style {
  *   - Error state renders as `<button>` so it's keyboard-reachable and
  *     clickable; `aria-label` explains the retry action.
  *
- * **D-15 (no pulse):** the dot is a static colored disc — no @keyframes,
- * no animation. The state text itself carries the information, not
- * motion.
+ * **D-15 (no pulse):** the dot is a static colored disc — no CSS
+ * keyframes, no transform pulsing. The state text itself carries the
+ * information, not motion.
  */
 export default function SavePill({ personId, onRetry }: Props) {
   const state = useTreeStore((s) => s.saveStateByPersonId[personId] ?? 'idle');

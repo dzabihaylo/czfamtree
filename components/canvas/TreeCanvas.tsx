@@ -3,8 +3,10 @@
 import { useEffect } from 'react';
 import { useTreeStore, type PersonRowDb } from '@/lib/store/tree-store';
 import EmptyTreeOverlay from '@/components/shell/EmptyTreeOverlay';
+import { useSaveQueue } from '@/lib/hooks/useSaveQueue';
 import PanZoomWrapper from './PanZoomWrapper';
 import SidePanel from './SidePanel';
+import SaveErrorToast from './SaveErrorToast';
 
 // The RSC (`app/(app)/tree/[treeId]/page.tsx`) selects only the columns
 // `personFromRow` reads — it omits `created_at`, `tree_id`, `updated_at`
@@ -45,6 +47,13 @@ export default function TreeCanvas({ tree, people }: TreeCanvasProps) {
   const sidePanelOpen = useTreeStore((s) => s.sidePanelOpen);
   const selectedPersonId = useTreeStore((s) => s.selectedPersonId);
 
+  // One save queue per tree — survives SidePanel open/close cycles so a
+  // 'saved' → 'idle' linger started before close still completes cleanly.
+  // Drag-save in PanZoomWrapper calls movePerson directly (needs optimistic
+  // revert that the generic queue doesn't provide); field edits in
+  // <SidePanel> and retries from <SaveErrorToast> route through here.
+  const queue = useSaveQueue(tree.id);
+
   useEffect(() => {
     // `people` is a structural subset of PersonRowDb (omitting columns the
     // hydrate path never reads). Cast is safe because `personFromRow` only
@@ -62,7 +71,13 @@ export default function TreeCanvas({ tree, people }: TreeCanvasProps) {
     <>
       <PanZoomWrapper tree={tree} />
       {peopleCount <= 1 && <EmptyTreeOverlay />}
-      {sidePanelOpen && selectedPersonId && <SidePanel tree={tree} />}
+      {sidePanelOpen && selectedPersonId && (
+        <SidePanel tree={tree} queue={queue} />
+      )}
+      {/* Toast mounted at canvas level (outside panel conditional) so
+          save errors on non-selected persons — e.g. a drag failure on a
+          different node — still surface a toast. */}
+      <SaveErrorToast onRetry={(id) => queue.retry(id)} />
     </>
   );
 }

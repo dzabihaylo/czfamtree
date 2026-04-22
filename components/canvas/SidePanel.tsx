@@ -8,7 +8,7 @@ import {
   type Person,
 } from '@/lib/store/tree-store';
 import type { PersonPatch } from '@/lib/schemas/person';
-import { useSaveQueue } from '@/lib/hooks/useSaveQueue';
+import type { SaveQueue } from '@/lib/hooks/useSaveQueue';
 import { removePerson } from '@/app/actions/people';
 import FieldInput from './fields/FieldInput';
 import FieldTextarea from './fields/FieldTextarea';
@@ -33,6 +33,13 @@ const NODE_HALF_H = 38;
 
 type Props = {
   tree: { id: string };
+  /**
+   * Save queue lives at the TreeCanvas level (one per tree) so it survives
+   * panel open/close cycles — a `'saved'` → `'idle'` linger timer started
+   * before close still completes cleanly even if the user closes the panel
+   * mid-linger. See Task 4 for the hoisting rationale.
+   */
+  queue: SaveQueue;
 };
 
 /**
@@ -79,7 +86,7 @@ type Props = {
  *     at full size (UI-SPEC Motion — instant in Phase 2, 300ms ease-out
  *     animation deferred to Phase 3 when per-transform tweens land).
  */
-export default function SidePanel({ tree }: Props) {
+export default function SidePanel({ tree, queue }: Props) {
   const personId = useTreeStore((s) => s.selectedPersonId);
   const open = useTreeStore((s) => s.sidePanelOpen);
   // `person` has to be a narrow per-person subscription so typing in the
@@ -94,7 +101,6 @@ export default function SidePanel({ tree }: Props) {
   const setPersonField = useTreeStore((s) => s.setPersonField);
 
   const storeApi = useTreeStoreApi();
-  const queue = useSaveQueue(tree.id);
 
   // Flush any pending debounce on panel close / person switch. `queue` lives
   // inside this component, so unmount implicitly clears the queue's timers
