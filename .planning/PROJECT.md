@@ -87,6 +87,7 @@ A person can open the app, see their family laid out on a clean canvas, and add/
 | Last-write-wins per field | CRDT is overkill for family-tree concurrency patterns | — Pending |
 | Optimistic-local, authoritative-server, reconcile-via-Realtime | Clients broadcast; server writes don't feed back through Postgres CDC (RLS-per-row too costly) | — Pending |
 | One Realtime channel per tree (`tree:${treeId}`) | Presence + broadcast multiplexed; throttle drag to ~30Hz, debounce field edits to 250–500ms | — Pending |
+| Pronouns column shipped in Phase 1 initial schema; Phase 2 side panel wires the UI (D-08) | Avoids a migration + types-regen in Phase 2; PersonPatchSchema already supports pronouns at the Zod layer | — Pending |
 
 ## Evolution
 

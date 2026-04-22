@@ -17,6 +17,16 @@
   --warning:      oklch(0.72 0.14 75);
 
   --grid-size:    24px;
+
+  /* Phase 2 — gender accent stripes (PersonNode 4px left edge, UI-SPEC §Color) */
+  --gender-m:     oklch(0.68 0.1 250);
+  --gender-f:     oklch(0.70 0.12 0);
+  --gender-x:     oklch(0.68 0.1 120);
+  --gender-u:     var(--rule);
+
+  /* Phase 2 — save-pill soft fills (pair with --success / --danger) */
+  --save-saved-bg:  oklch(0.92 0.08 150);
+  --save-error-bg:  oklch(0.92 0.08 25);
 }
 
 /* Tailwind v4 @theme block — maps CSS vars to Tailwind tokens (per UI-SPEC 4px multiples + 2-weight Inter) */
@@ -34,6 +44,14 @@
   --color-success:      var(--success);
   --color-danger:       var(--danger);
   --color-warning:      var(--warning);
+
+  /* Phase 2 — expose gender + save-state tokens as Tailwind color utilities */
+  --color-gender-m:      var(--gender-m);
+  --color-gender-f:      var(--gender-f);
+  --color-gender-x:      var(--gender-x);
+  --color-gender-u:      var(--gender-u);
+  --color-save-saved-bg: var(--save-saved-bg);
+  --color-save-error-bg: var(--save-error-bg);
 
   /* Spacing — 4px multiples only per UI-SPEC §Spacing Scale */
   --spacing-2xs: 4px;
@@ -63,7 +81,7 @@ html, body {
   font-feature-settings: 'ss01', 'cv11';
 }
 
-/* Grid background utility (handoff styles.css L59-64) — used by GridBackground component in plan 04 */
+/* Grid background utility (handoff styles.css L59-64) — applied on .canvas-inner (Plan 02) so grid pans+scales with world; GridBackground component was deleted per D-08. */
 .grid-bg {
   background-image:
     linear-gradient(to right, var(--rule-soft) 1px, transparent 1px),

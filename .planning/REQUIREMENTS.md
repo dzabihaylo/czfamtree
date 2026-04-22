@@ -33,8 +33,8 @@
 
 ### Canvas & Rendering
 
-- [ ] **CANV-01**: Canvas fills viewport below the 56px topbar; pans via drag-empty-space; zooms via ⌘+scroll or toolbar buttons
-- [ ] **CANV-02**: Background renders faint dot grid (8px spacing, `--ink-4` at 10% opacity)
+- [ ] **CANV-01**: Canvas fills viewport below the 52px topbar; pans via drag-empty-space; zooms via ⌘+scroll or toolbar buttons
+- [ ] **CANV-02**: Background renders faint dot grid (24px spacing, `--rule-soft`)
 - [ ] **CANV-03**: Pan/zoom implemented via single CSS `translate(x,y) scale(k)` wrapper; all drag deltas divide by `k` for canvas-space correctness
 - [ ] **CANV-04**: Wheel handler registered via `addEventListener('wheel', h, {passive:false})`; macOS trackpad pinch (wheel+ctrlKey) handled
 - [ ] **CANV-05**: Fit-to-view button resets transform to `{x:400, y:180, k:1}`
