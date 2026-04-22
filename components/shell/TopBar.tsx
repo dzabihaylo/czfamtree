@@ -34,6 +34,7 @@ export default function TopBar({
 }: TopBarProps) {
   return (
     <header
+      data-topbar
       role="banner"
       className="sticky top-0 left-0 right-0 z-50 flex items-center gap-lg bg-bg border-b border-rule"
       style={{ height: 52, padding: '0 16px' }}
