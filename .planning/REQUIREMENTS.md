@@ -56,20 +56,20 @@
 
 - [x] **SEL-01**: Click a node selects it (blue border); click same node deselects; click empty canvas deselects everything
 - [x] **SEL-02**: Esc key deselects and closes radial / side panel
-- [ ] **SEL-03**: Enter key on selected node opens the side panel
-- [ ] **PANEL-01**: Double-click a node opens the side panel; toolbar panel-toggle button also opens/closes it
-- [ ] **PANEL-02**: Side panel is right-docked, 380px wide, full viewport height, white fill, 1px `--rule` left edge
-- [ ] **PANEL-03**: Header shows "Person · [id6]" (mono uppercase) + Saved/Auto-saves pill + X close button
-- [ ] **PANEL-04**: Identity section: Name input, gender select (m/f/x/u), pronouns free-text
-- [ ] **PANEL-05**: Life section: Birth year, death year, birth place, notes textarea
-- [ ] **PANEL-06**: Relationships section: read-only list (Parents / Spouse / Children) with clickable names that select+recenter
-- [ ] **PANEL-07**: Actions section: "Center on this person" button; "Remove" button (red text, confirms via modal before delete)
-- [ ] **PANEL-08**: Self-person row hides the Remove action (cannot delete the "is_me" node)
-- [ ] **PANEL-09**: Footer: "Changes save automatically" hint + Done primary button that closes the panel
-- [ ] **SAVE-01**: Field edits debounced ~250–500ms, persisted via Server Action
-- [ ] **SAVE-02**: Auto-save pill state machine: `idle → dirty → saving → saved | error` — pill flips green ONLY on server ACK
-- [ ] **SAVE-03**: Pill stays green ~1.4s after save, then returns to neutral "Auto-saves" state
-- [ ] **SAVE-04**: On save error, pill shows red + "Couldn't save" toast with Retry; saves queue serially per person to prevent request reordering
+- [x] **SEL-03**: Enter key on selected node opens the side panel
+- [x] **PANEL-01**: Double-click a node opens the side panel; toolbar panel-toggle button also opens/closes it
+- [x] **PANEL-02**: Side panel is right-docked, 380px wide, full viewport height, white fill, 1px `--rule` left edge
+- [x] **PANEL-03**: Header shows "Person · [id6]" (mono uppercase) + Saved/Auto-saves pill + X close button
+- [x] **PANEL-04**: Identity section: Name input, gender select (m/f/x/u), pronouns free-text
+- [x] **PANEL-05**: Life section: Birth year, death year, birth place, notes textarea
+- [x] **PANEL-06**: Relationships section: read-only list (Parents / Spouse / Children) with clickable names that select+recenter
+- [x] **PANEL-07**: Actions section: "Center on this person" button; "Remove" button (red text, confirms via modal before delete)
+- [x] **PANEL-08**: Self-person row hides the Remove action (cannot delete the "is_me" node)
+- [x] **PANEL-09**: Footer: "Changes save automatically" hint + Done primary button that closes the panel
+- [x] **SAVE-01**: Field edits debounced ~250–500ms, persisted via Server Action
+- [x] **SAVE-02**: Auto-save pill state machine: `idle → dirty → saving → saved | error` — pill flips green ONLY on server ACK
+- [x] **SAVE-03**: Pill stays green ~1.4s after save, then returns to neutral "Auto-saves" state
+- [x] **SAVE-04**: On save error, pill shows red + "Couldn't save" toast with Retry; saves queue serially per person to prevent request reordering
 
 ### Add-Relative & Radial Menu
 
@@ -131,7 +131,7 @@
 
 ### Error Handling, A11y, Design Fidelity
 
-- [ ] **ERR-01**: Save failure shows toast + marks pill red; retry available
+- [x] **ERR-01**: Save failure shows toast + marks pill red; retry available
 - [ ] **ERR-02**: Realtime disconnect banner visible across all views while disconnected
 - [ ] **A11Y-01**: All interactive controls have focus rings and ARIA labels
 - [ ] **A11Y-02**: Keyboard shortcut scope is correct (typing in a field does not trigger canvas Cmd-Z)
@@ -247,21 +247,21 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 | EDGE-06 | Phase 2 | Complete |
 | SEL-01 | Phase 2 | Complete |
 | SEL-02 | Phase 2 | Complete |
-| SEL-03 | Phase 2 | Pending |
-| PANEL-01 | Phase 2 | Pending |
-| PANEL-02 | Phase 2 | Pending |
-| PANEL-03 | Phase 2 | Pending |
-| PANEL-04 | Phase 2 | Pending |
-| PANEL-05 | Phase 2 | Pending |
-| PANEL-06 | Phase 2 | Pending |
-| PANEL-07 | Phase 2 | Pending |
-| PANEL-08 | Phase 2 | Pending |
-| PANEL-09 | Phase 2 | Pending |
-| SAVE-01 | Phase 2 | Pending |
-| SAVE-02 | Phase 2 | Pending |
-| SAVE-03 | Phase 2 | Pending |
-| SAVE-04 | Phase 2 | Pending |
-| ERR-01 | Phase 2 | Pending |
+| SEL-03 | Phase 2 | Complete |
+| PANEL-01 | Phase 2 | Complete |
+| PANEL-02 | Phase 2 | Complete |
+| PANEL-03 | Phase 2 | Complete |
+| PANEL-04 | Phase 2 | Complete |
+| PANEL-05 | Phase 2 | Complete |
+| PANEL-06 | Phase 2 | Complete |
+| PANEL-07 | Phase 2 | Complete |
+| PANEL-08 | Phase 2 | Complete |
+| PANEL-09 | Phase 2 | Complete |
+| SAVE-01 | Phase 2 | Complete |
+| SAVE-02 | Phase 2 | Complete |
+| SAVE-03 | Phase 2 | Complete |
+| SAVE-04 | Phase 2 | Complete |
+| ERR-01 | Phase 2 | Complete |
 | DESIGN-01 | Phase 2 | Complete |
 | DESIGN-02 | Phase 2 | Complete |
 | RAD-01 | Phase 3 | Pending |

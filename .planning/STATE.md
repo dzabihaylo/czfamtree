@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-22T10:26:39.807Z"
+last_updated: "2026-04-22T10:40:43.167Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 7
-  completed_plans: 6
-  percent: 86
+  completed_plans: 7
+  percent: 100
 ---
 
 # STATE: CZ Family Tree
 
-**Last updated:** 2026-04-22 (after plan 02-02 execution — Phase 2 canvas render landed)
+**Last updated:** 2026-04-22 (after plan 02-03 execution — Phase 2 save pipeline + side panel landed)
 
 ## Project Reference
 
@@ -25,21 +25,21 @@ progress:
 
 ## Current Position
 
-Phase: 02 (canvas-nodes-edit) — EXECUTING
-Plan: 3 of 3 (01, 02 complete)
+Phase: 02 (canvas-nodes-edit) — COMPLETE (awaiting verification)
+Plan: 3 of 3 (01, 02, 03 complete)
 
 - **Milestone:** v1 Launch
-- **Phase:** 02 — Canvas, Nodes & Edit (in progress, 2/3 plans done)
-- **Plan:** 01-01 → 01-04 complete (Phase 1). 02-01 complete — data plumbing (Zod strict PersonPatchSchema, Server Actions, computeEdges utility, extended store). 02-02 complete — canvas render (TreeStoreProvider wiring, TreeCanvas shell, PanZoomWrapper with pan/zoom/drag/Escape and movePerson persistence, EdgeLayer single-SVG with non-scaling-stroke, PersonNode 180×76 with all visual states, AvatarCircle 40px, useTreeStoreApi helper).
-- **Status:** Executing Phase 02
-- **Progress:** [█████████░] 86%
+- **Phase:** 02 — Canvas, Nodes & Edit (3/3 plans done — awaiting phase verification)
+- **Plan:** 01-01 → 01-04 complete (Phase 1). 02-01 complete — data plumbing (Zod strict PersonPatchSchema, Server Actions, computeEdges utility, extended store). 02-02 complete — canvas render (TreeStoreProvider wiring, TreeCanvas shell, PanZoomWrapper with pan/zoom/drag/Escape and movePerson persistence, EdgeLayer single-SVG with non-scaling-stroke, PersonNode 180×76 with all visual states, AvatarCircle 40px, useTreeStoreApi helper). 02-03 complete — save pipeline + side panel (useSaveQueue per-person serial queue, FieldInput/FieldTextarea/GenderSelect, RelationsList, SavePill 5-state, SaveErrorToast, 380px SidePanel with full Identity/Life/Relations/Actions/Footer structure, window.confirm-gated Remove hidden for is_me, queue hoisted to canvas level).
+- **Status:** Phase 02 Complete (ready for verifier)
+- **Progress:** [██████████] 100%
 
 ### Roadmap Overview
 
 | Phase | Goal | Status |
 |-------|------|--------|
 | 1. Foundation | Signed-in user lands in own private tree with schema + RLS correct | Complete (4/4 plans done — awaiting verification) |
-| 2. Canvas, Nodes & Edit | Pan/zoom canvas, PersonNode, SidePanel, trustworthy auto-save | In Progress (2/3 plans done — data plumbing + canvas render landed; save pipeline + side panel next) |
+| 2. Canvas, Nodes & Edit | Pan/zoom canvas, PersonNode, SidePanel, trustworthy auto-save | Complete (3/3 plans done — awaiting verification) |
 | 3. Authoring & History | Radial-add, undo/redo, toolbar, toasts, search, a11y | Not started |
 | 4. Tidy & Layout | Dagre couple-merge layout with animated transition | Not started |
 | 5. Share & Realtime | Share modal, Realtime presence + cursors + broadcast, deploy | Not started |
@@ -66,6 +66,7 @@ Baseline targets (tracked once implementation begins):
 | 01-04 | 18min | 3 | 15 created + 2 modified |
 | 02-01 | 8min | 4 | 4 created + 3 modified + 2 deleted |
 | 02-02 | 35min | 4 | 5 created + 4 modified |
+| 02-03 | 8min | 4 | 8 created + 1 modified |
 
 ## Accumulated Context
 
@@ -83,6 +84,17 @@ Baseline targets (tracked once implementation begins):
 - One Realtime channel per tree: `tree:${treeId}` (presence + broadcast multiplexed)
 - Optimistic-local + authoritative-server + reconcile-via-Realtime-broadcast (not Postgres CDC)
 - Ship handoff steps 1–8 as v1 (Share included); Google Sheets sync deferred to v2
+
+### Phase 02 Plan 03 decisions
+
+- `useSaveQueue` holds per-person slots in `useRef<Map<personId, PerPerson>>` — not React state — so no per-keystroke re-render of the hook consumer. All mutation to the PerPerson objects is synchronous inside hook callbacks.
+- `runSave` finally-branch chains a new save only if `!e.inFlight` after the await resolves — structural SAVE-04 serial guarantee: two concurrent `updatePerson` Promises for the same personId are impossible. If new edits arrived while the save was in-flight, they land in `e.pending` and the finally branch starts a new chained save.
+- Pill 'saved' → 'idle' 1400ms linger guarded by read-back check (`if saveStateByPersonId[id] === 'saved'`) — mirrors the Plan 02 drag-save pattern. A new edit that transitioned the pill to 'saving' or 'error' mid-linger is not clobbered.
+- SaveErrorToast copy is person-level (`Couldn't save changes for {name}`) not field-level — useSaveQueue batches dirty fields into one patch per person; matches the drag-failure precedent; Plan 04 can refine if QA asks.
+- Center-on-person is instant — UI-SPEC §Motion calls for a 300ms cubic-bezier tween, but Phase 2 transforms via setTransform state; a CSS transition would fight the pan-handler's continuous updates. Deferred to Phase 3 when layout animations land for Tidy.
+- useSaveQueue hoisted to TreeCanvas (Task 4 refactor from Task 3's inline form) — one queue per tree survives panel open/close cycles so the 1400ms linger completes cleanly, AND SaveErrorToast can drive the same queue's retry from outside the panel.
+- `enqueueMove` shipped in the SaveQueue API but unused by Phase 2 drag — PanZoomWrapper still calls `movePerson` directly because drag needs optimistic-revert-on-error which the generic queue doesn't implement. Exposed for future consumers.
+- Field `commit(field, value)` funnel writes optimistic-local via `setPersonField` BEFORE enqueueing — PersonNode + EdgeLayer re-render with the new name/years/gender stripe immediately; the pill flips green only on server ACK (SAVE-02).
 
 ### Phase 02 Plan 02 decisions
 
@@ -117,21 +129,21 @@ None currently. User approval of the roadmap is the only gate to beginning Phase
 
 ### Last Session
 
-- Executed Phase 2 Plan 02 (`/gsd-execute-phase 2`) — 4 tasks, sequential; two Rule-3 blocking deviations both anticipated by the plan itself (narrower TreeCanvas prop type + Task 1 EdgeLayer/PersonNode stubs)
-  - Task 1 (commit `d9f784d`): wrapped `app/(app)/layout.tsx` with `<TreeStoreProvider>`; widened `app/(app)/tree/[treeId]/page.tsx` people SELECT to all Phase 2 columns and mounted `<TreeCanvas tree={tree} people={peopleList} />`; added `data-topbar` to `components/shell/TopBar.tsx`; created `components/canvas/TreeCanvas.tsx` (hydrates store on `[tree.id]` dep), `components/canvas/PanZoomWrapper.tsx` (pan + cursor-anchored wheel zoom clamped `[0.25, 4]` @ sensitivity 0.0015 + two-finger trackpad pan + Escape deselect, wheel listener via `addEventListener` with `{ passive: false }`), stub `EdgeLayer.tsx` + stub `PersonNode.tsx`
-  - Task 2 (commit `d1acc60`): filled `components/canvas/EdgeLayer.tsx` — single `<svg>` with `overflow: 'visible'`, `pointerEvents: 'none'`, non-scaling-stroke on every path (REQ EDGE-05), O(1) `peopleRecord[id]` lookups; filled `components/canvas/AvatarCircle.tsx` — 40px circle with `hashUserIdToColor(personId)` background
-  - Task 3 (commit `718eab3`): extended `PanZoomWrapper.tsx` with `DragStateContext` (MutableRefObject shared with `<PersonNode>`), 3px threshold drag branch in window mousemove (deltas divided by `transform.k`), drag-end `movePerson(treeId, id, x, y)` commit with pill `idle → saving → saved (1400ms) → idle` (read-back guarded) and optimistic revert + pill `'error'` on failure; added `useTreeStoreApi()` helper to `lib/store/tree-store.ts`
-  - Task 4 (commit `3e7900c`): filled `components/canvas/PersonNode.tsx` — 180×76 card with `data-node`/`role="button"`/`aria-pressed`/`tabIndex={0}`, 4px gender stripe (`--gender-{m,f,x,u}`), `<AvatarCircle>`, name + years copy per UI-SPEC, selection shadow `0 0 0 2px --accent, 4px 4px 0 --accent`, dragging shadow `6px 6px 0 --ink` + z-index 100, is-me `YOU` ribbon, selected-only `+` button (28×28, `--accent` bg, `2px 2px 0 --ink` shadow, `Plus` from lucide, Phase 3 no-op); narrow per-person store selectors (D-10)
-  - `npx tsc --noEmit` clean; `npx next build` succeeded (5 routes, Compiled successfully in 1882ms); `npx vitest run` 16 passed + 3 skipped (unchanged); `grep dangerouslySetInnerHTML` in canvas/actions/(app) = 0 matches; `grep 'useTreeStore\(s => s\.people\)'` in PersonNode = 0 matches (narrow selectors enforced)
-  - Duration: 35 min
-  - Requirements marked complete: CANV-01..06, NODE-01..06, EDGE-02..06, SEL-01, SEL-02, DESIGN-01, DESIGN-02
+- Executed Phase 2 Plan 03 (`/gsd-execute-phase 2`) — 4 tasks, sequential; two Rule-1 acceptance-criterion-alignment deviations (same grep-hygiene pattern as 02-01), zero runtime behavior change
+  - Task 1 (commit `3ddfc56`): created `lib/hooks/useSaveQueue.ts` — per-person serial queue via `useRef<Map<personId, PerPerson>>`, 400ms per-field debounce, pill transitions (idle/saving/saved/error) with 1400ms saved-linger guarded by read-back, `enqueueField`/`enqueueMove`/`flush`/`retry` API, SAVE-04 serial guarantee via runSave finally-chain
+  - Task 2 (commit `535dc77`): created `components/canvas/fields/FieldInput.tsx` (local-mirror + 400ms debounce + onBlur flush, variants text/mono/year), `FieldTextarea.tsx` (same pattern, 4 rows, vertical resize), `GenderSelect.tsx` (3-button segmented, immediate commit, role=radiogroup + role=radio + aria-checked)
+  - Task 3 (commit `58577a2`): created `components/canvas/RelationsList.tsx` (Parents/Spouses/Children middot-separated clickable), `SavePill.tsx` (5-state pill, error renders as button, static dot per D-15), `SidePanel.tsx` (380×viewport aside at top:52, z-[40], full Identity/Life/Relations/Actions/Footer structure, window.confirm-gated Remove hidden for is_me, center-on-person math subtracting PANEL_WIDTH from viewport); mounted `<SidePanel>` in `TreeCanvas.tsx` conditional on `sidePanelOpen && selectedPersonId`
+  - Task 4 (commit `52cba97`): created `components/canvas/SaveErrorToast.tsx` (role=alert + aria-live=assertive, 4400ms auto-dismiss, Retry delegates to queue); hoisted `useSaveQueue` to TreeCanvas and refactored SidePanel to accept `queue: SaveQueue` as prop so the queue survives panel open/close cycles and SaveErrorToast can drive retry from outside the panel
+  - `npx tsc --noEmit` clean; `npx next build` succeeded (5 routes, Compiled successfully in 1678ms); `npx vitest run` 16 passed + 3 skipped (unchanged); all phase-level greps PASS (no dangerouslySetInnerHTML, no temporal/pastStates wiring, no @keyframes/animation in SavePill, no react-hot-toast)
+  - Duration: 8 min
+  - Requirements marked complete: SEL-03, PANEL-01..09, SAVE-01..04, ERR-01, DESIGN-01, DESIGN-02
 
 ### Next Session
 
-Plan 02-02 is complete. Canvas render is live; Plan 02-03 (save pipeline + side panel) is the last Phase 2 wave:
+**Phase 2 is complete.** 02-01 (data plumbing) + 02-02 (canvas render) + 02-03 (save pipeline + side panel) shipped a full interactive canvas: pan/zoom/drag/Escape, PersonNode with selection + is-me YOU ribbon + selected-only `+` button (Phase 3 handoff), EdgeLayer single-SVG, SidePanel with full edit + remove + relations + center + save pipeline.
 
-1. **Plan 02-03** (save pipeline + side panel): `<SidePanel>` + field components + `<SavePill>` + `<SaveErrorToast>` + `useSaveQueue` hook — consumes `PersonPatchSchema`/`PersonPatch`/`toDbPatch` from `lib/schemas/person.ts`, `updatePerson`/`movePerson`/`removePerson` from `app/actions/people.ts`, and this plan's `DragStateContext` + `useTreeStoreApi`. PersonNode already calls `setSidePanelOpen(true)` on double-click + Enter — `<SidePanel>` just needs to subscribe to `sidePanelOpen` + `selectedPersonId`.
-2. Phase 2 end: verify cross-user RLS isolation on people mutations (`updatePerson` under a shared tree as editor vs viewer — should fail for viewer).
+1. **Phase 2 verification:** cross-user RLS isolation check on people mutations (`updatePerson` / `removePerson` under a shared tree as editor vs viewer — viewer should fail). Requires a two-account live session; flagged for the verifier agent.
+2. **Phase 3 planning target** — Authoring & History: radial-add menu wired to the PersonNode `+` button (currently a no-op logging `[Phase 3] radial open for {id}`), undo/redo via zundo wired to drag + edit setters (HIST-01..05 — `pastStates.push` currently NOT invoked per D-06), toolbar with Undo/Redo/Fit/Tidy/Share buttons, search, a11y audit.
 
 ### Context Notes
 
