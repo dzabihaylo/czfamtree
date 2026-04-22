@@ -33,29 +33,29 @@
 
 ### Canvas & Rendering
 
-- [ ] **CANV-01**: Canvas fills viewport below the 52px topbar; pans via drag-empty-space; zooms via ⌘+scroll or toolbar buttons
-- [ ] **CANV-02**: Background renders faint dot grid (24px spacing, `--rule-soft`)
-- [ ] **CANV-03**: Pan/zoom implemented via single CSS `translate(x,y) scale(k)` wrapper; all drag deltas divide by `k` for canvas-space correctness
-- [ ] **CANV-04**: Wheel handler registered via `addEventListener('wheel', h, {passive:false})`; macOS trackpad pinch (wheel+ctrlKey) handled
-- [ ] **CANV-05**: Fit-to-view button resets transform to `{x:400, y:180, k:1}`
-- [ ] **CANV-06**: Zoom range clamped to `[0.25, 4]`; zoom anchors to pointer position when using wheel
-- [ ] **NODE-01**: `PersonNode` renders at stored `x, y`: 180×76px white card, 1px `--rule` border, 8px radius, shadow
-- [ ] **NODE-02**: Node shows 40px avatar circle (initials) + name + birth–death years
-- [ ] **NODE-03**: Node has 4px gender accent stripe on left edge (male/female/nonbinary/unknown colors)
-- [ ] **NODE-04**: Hover state: shadow lifts, border darkens
-- [ ] **NODE-05**: Selected state: 2px `--accent` border + visible `+` button anchored bottom-right
-- [ ] **NODE-06**: User can drag a node to reposition (canvas-space, respects zoom); mouseup commits to history
+- [x] **CANV-01**: Canvas fills viewport below the 52px topbar; pans via drag-empty-space; zooms via ⌘+scroll or toolbar buttons
+- [x] **CANV-02**: Background renders faint dot grid (24px spacing, `--rule-soft`)
+- [x] **CANV-03**: Pan/zoom implemented via single CSS `translate(x,y) scale(k)` wrapper; all drag deltas divide by `k` for canvas-space correctness
+- [x] **CANV-04**: Wheel handler registered via `addEventListener('wheel', h, {passive:false})`; macOS trackpad pinch (wheel+ctrlKey) handled
+- [x] **CANV-05**: Fit-to-view button resets transform to `{x:400, y:180, k:1}`
+- [x] **CANV-06**: Zoom range clamped to `[0.25, 4]`; zoom anchors to pointer position when using wheel
+- [x] **NODE-01**: `PersonNode` renders at stored `x, y`: 180×76px white card, 1px `--rule` border, 8px radius, shadow
+- [x] **NODE-02**: Node shows 40px avatar circle (initials) + name + birth–death years
+- [x] **NODE-03**: Node has 4px gender accent stripe on left edge (male/female/nonbinary/unknown colors)
+- [x] **NODE-04**: Hover state: shadow lifts, border darkens
+- [x] **NODE-05**: Selected state: 2px `--accent` border + visible `+` button anchored bottom-right
+- [x] **NODE-06**: User can drag a node to reposition (canvas-space, respects zoom); mouseup commits to history
 - [x] **EDGE-01**: `computeEdges(people)` pure function derives edges from relationship arrays — edges never stored
-- [ ] **EDGE-02**: Single `<svg>` overlay beneath node layer renders all edges (not one SVG per edge)
-- [ ] **EDGE-03**: Spouse edges render as horizontal lines between nodes at same y
-- [ ] **EDGE-04**: Parent–child edges render as orthogonal paths (down from parent-pair midpoint, across, down into child)
-- [ ] **EDGE-05**: Edges use `--rule` color at 1.5px with `vector-effect="non-scaling-stroke"` (constant width under zoom)
-- [ ] **EDGE-06**: Renders 200 nodes + edges at 60fps on a modern laptop
+- [x] **EDGE-02**: Single `<svg>` overlay beneath node layer renders all edges (not one SVG per edge)
+- [x] **EDGE-03**: Spouse edges render as horizontal lines between nodes at same y
+- [x] **EDGE-04**: Parent–child edges render as orthogonal paths (down from parent-pair midpoint, across, down into child)
+- [x] **EDGE-05**: Edges use `--rule` color at 1.5px with `vector-effect="non-scaling-stroke"` (constant width under zoom)
+- [x] **EDGE-06**: Renders 200 nodes + edges at 60fps on a modern laptop
 
 ### Selection & Side Panel
 
-- [ ] **SEL-01**: Click a node selects it (blue border); click same node deselects; click empty canvas deselects everything
-- [ ] **SEL-02**: Esc key deselects and closes radial / side panel
+- [x] **SEL-01**: Click a node selects it (blue border); click same node deselects; click empty canvas deselects everything
+- [x] **SEL-02**: Esc key deselects and closes radial / side panel
 - [ ] **SEL-03**: Enter key on selected node opens the side panel
 - [ ] **PANEL-01**: Double-click a node opens the side panel; toolbar panel-toggle button also opens/closes it
 - [ ] **PANEL-02**: Side panel is right-docked, 380px wide, full viewport height, white fill, 1px `--rule` left edge
@@ -137,7 +137,7 @@
 - [ ] **A11Y-02**: Keyboard shortcut scope is correct (typing in a field does not trigger canvas Cmd-Z)
 - [ ] **A11Y-03**: Tab order: topbar → canvas container → toolbar → side panel (when open)
 - [x] **DESIGN-01**: Colors, typography, spacing, radii, shadows match design tokens in handoff `styles.css` exactly
-- [ ] **DESIGN-02**: Inline icons replaced 1:1 with `lucide-react` equivalents (User, Plus, X, Undo2, Redo2, Maximize2, Sparkles, Share2, Trash2, ExternalLink, …)
+- [x] **DESIGN-02**: Inline icons replaced 1:1 with `lucide-react` equivalents (User, Plus, X, Undo2, Redo2, Maximize2, Sparkles, Share2, Trash2, ExternalLink, …)
 - [x] **DESIGN-03**: Tailwind v4 `@theme` maps handoff `:root` CSS variables directly (no drift between prototype and app)
 
 ### Testing & Deploy
@@ -227,26 +227,26 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 | DATA-10 | Phase 1 | Complete |
 | DESIGN-03 | Phase 1 | Complete |
 | DEP-02 | Phase 1 | Complete |
-| CANV-01 | Phase 2 | Pending |
-| CANV-02 | Phase 2 | Pending |
-| CANV-03 | Phase 2 | Pending |
-| CANV-04 | Phase 2 | Pending |
-| CANV-05 | Phase 2 | Pending |
-| CANV-06 | Phase 2 | Pending |
-| NODE-01 | Phase 2 | Pending |
-| NODE-02 | Phase 2 | Pending |
-| NODE-03 | Phase 2 | Pending |
-| NODE-04 | Phase 2 | Pending |
-| NODE-05 | Phase 2 | Pending |
-| NODE-06 | Phase 2 | Pending |
+| CANV-01 | Phase 2 | Complete |
+| CANV-02 | Phase 2 | Complete |
+| CANV-03 | Phase 2 | Complete |
+| CANV-04 | Phase 2 | Complete |
+| CANV-05 | Phase 2 | Complete |
+| CANV-06 | Phase 2 | Complete |
+| NODE-01 | Phase 2 | Complete |
+| NODE-02 | Phase 2 | Complete |
+| NODE-03 | Phase 2 | Complete |
+| NODE-04 | Phase 2 | Complete |
+| NODE-05 | Phase 2 | Complete |
+| NODE-06 | Phase 2 | Complete |
 | EDGE-01 | Phase 2 | Complete |
-| EDGE-02 | Phase 2 | Pending |
-| EDGE-03 | Phase 2 | Pending |
-| EDGE-04 | Phase 2 | Pending |
-| EDGE-05 | Phase 2 | Pending |
-| EDGE-06 | Phase 2 | Pending |
-| SEL-01 | Phase 2 | Pending |
-| SEL-02 | Phase 2 | Pending |
+| EDGE-02 | Phase 2 | Complete |
+| EDGE-03 | Phase 2 | Complete |
+| EDGE-04 | Phase 2 | Complete |
+| EDGE-05 | Phase 2 | Complete |
+| EDGE-06 | Phase 2 | Complete |
+| SEL-01 | Phase 2 | Complete |
+| SEL-02 | Phase 2 | Complete |
 | SEL-03 | Phase 2 | Pending |
 | PANEL-01 | Phase 2 | Pending |
 | PANEL-02 | Phase 2 | Pending |
@@ -263,7 +263,7 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 | SAVE-04 | Phase 2 | Pending |
 | ERR-01 | Phase 2 | Pending |
 | DESIGN-01 | Phase 2 | Complete |
-| DESIGN-02 | Phase 2 | Pending |
+| DESIGN-02 | Phase 2 | Complete |
 | RAD-01 | Phase 3 | Pending |
 | RAD-02 | Phase 3 | Pending |
 | RAD-03 | Phase 3 | Pending |
