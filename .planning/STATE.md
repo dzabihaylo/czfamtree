@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-22T09:59:20.099Z"
+last_updated: "2026-04-22T10:11:14.195Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
-  percent: 57
+  completed_plans: 5
+  percent: 71
 ---
 
 # STATE: CZ Family Tree
 
-**Last updated:** 2026-04-21 (after plan 01-04 execution — Phase 1 COMPLETE)
+**Last updated:** 2026-04-22 (after plan 02-01 execution — Phase 2 data plumbing landed)
 
 ## Project Reference
 
@@ -26,20 +26,20 @@ progress:
 ## Current Position
 
 Phase: 02 (canvas-nodes-edit) — EXECUTING
-Plan: 1 of 3
+Plan: 2 of 3 (01 complete)
 
 - **Milestone:** v1 Launch
-- **Phase:** 01 — Foundation (complete, awaiting verifier)
-- **Plan:** 01-01 + 01-02 + 01-03 + 01-04 complete (scaffold + Clerk + Supabase + tokens + Zustand + cloud-applied schema + RLS + typed Database generic + Clerk sign-in/sign-up pages + split-50/50 auth shell + decorative SVG + bootstrap server action + root redirect + authenticated shell with 52px topbar + inline tree rename + tree switcher + user menu with Sign out + `/tree/[treeId]` RSC with RLS-gated reads + seed YOU node + empty overlay + AuthError fallback + Playwright E2E env-gated)
+- **Phase:** 02 — Canvas, Nodes & Edit (in progress, 1/3 plans done)
+- **Plan:** 01-01 → 01-04 complete (Phase 1). 02-01 complete — Phase 2 data plumbing (PersonPatchSchema strict, three Server Actions with RLS + (id, tree_id) defense-in-depth, computeEdges/spousePath/parentPath pure utilities, extended Zustand TreeState with Record<id, Person> + drag/save slices, Tailwind gender + save-state tokens, D-08 grooming)
 - **Status:** Executing Phase 02
-- **Progress:** [██████████] 100%
+- **Progress:** [███████░░░] 71%
 
 ### Roadmap Overview
 
 | Phase | Goal | Status |
 |-------|------|--------|
 | 1. Foundation | Signed-in user lands in own private tree with schema + RLS correct | Complete (4/4 plans done — awaiting verification) |
-| 2. Canvas, Nodes & Edit | Pan/zoom canvas, PersonNode, SidePanel, trustworthy auto-save | Not started |
+| 2. Canvas, Nodes & Edit | Pan/zoom canvas, PersonNode, SidePanel, trustworthy auto-save | In Progress (1/3 plans done — data plumbing landed; canvas + save pipeline next) |
 | 3. Authoring & History | Radial-add, undo/redo, toolbar, toasts, search, a11y | Not started |
 | 4. Tidy & Layout | Dagre couple-merge layout with animated transition | Not started |
 | 5. Share & Realtime | Share modal, Realtime presence + cursors + broadcast, deploy | Not started |
@@ -64,6 +64,7 @@ Baseline targets (tracked once implementation begins):
 | 01-02 | 35min | 2 | 6 |
 | 01-03 | 20min | 3 | 6 created + 1 modified |
 | 01-04 | 18min | 3 | 15 created + 2 modified |
+| 02-01 | 8min | 4 | 4 created + 3 modified + 2 deleted |
 
 ## Accumulated Context
 
@@ -82,6 +83,15 @@ Baseline targets (tracked once implementation begins):
 - Optimistic-local + authoritative-server + reconcile-via-Realtime-broadcast (not Postgres CDC)
 - Ship handoff steps 1–8 as v1 (Share included); Google Sheets sync deferred to v2
 
+### Phase 02 Plan 01 decisions
+
+- `PersonPatchSchema.strict()` rejects unknown keys — primary mitigation for threat T-02-01 (mass assignment); prevents client smuggling of tree_id, is_me, owner_user_id
+- All three Server Actions scope mutations via `.eq('id', personId).eq('tree_id', treeId)` — defense-in-depth for T-02-02 (IDOR cross-tree writes) even though RLS is authoritative
+- Error wrapping surfaces only `error.message` — `error.hint`, `error.details`, `error.code` never leak; prevents Postgres constraint text from reaching the client toast (T-02-04)
+- `temporal()` wrapper preserved in the Zustand store but drag/edit setters do NOT register past-states yet — Phase 3 (HIST-01..05) wires undo/redo (D-06); prevents failed saves from polluting history
+- D-05 pronouns migration dropped entirely — `pronouns text` already ships in the initial schema at `supabase/migrations/20260421000000_initial_schema.sql` L48; no 0002 migration created
+- `computeEdges` ported verbatim from handoff `model.jsx` L45-62 with NODE_W/H overridden to 180/76 (REQ NODE-01) and the handoff's magic `+ 70` spouse y-offset replaced by honest `+ NODE_H / 2 = 38` (UI-SPEC §8)
+
 ### Open Questions / Todos
 
 - **Phase 1 planning:** decide step-relations data model before schema freeze — accept `parent_ids ≤ 2` limitation OR promote to `relationships` table
@@ -96,23 +106,22 @@ None currently. User approval of the roadmap is the only gate to beginning Phase
 
 ### Last Session
 
-- Executed Phase 1 Plan 04 (`/gsd-execute-phase 1`) — 3 tasks, linear, 2 Rule-1 auto-fixes (caret pin on @clerk/testing, Supabase nested-select array widening)
-  - Task 1 (commit `093750b`): created `app/actions/trees.ts` (listMyTrees + createNewTree + renameTree with getUserIdOrThrow defense-in-depth; renameTree trims + caps at 80 chars + silently reverts on empty per UI-SPEC), `lib/utils/hashUserId.ts` (4-OKLCH palette + initialsFromName), and 6 static shell primitives: Avatar (sole rounded-full consumer in components/shell/), BrandMark (dual 20/28 CZ glyph), GridBackground, SeedPersonNode (168×auto is-me with YOU ribbon), EmptyTreeOverlay ("Your tree is ready." + UI-SPEC copy), AuthError (bootstrap + rls-reject variants)
-  - Task 2 (commit `b4e946a`): created 4 interactive shell components: TreeTitle (display/edit modes, Enter/blur commits via renameTree, Escape reverts, maxLength 80), TreeSwitcher (280px Swiss-card dropdown with YOUR TREES + SHARED WITH YOU + "+ New tree"; outside-click + Escape close with setTimeout(10) guard), UserMenu (240px right-aligned dropdown with Clerk useClerk().signOut({redirectUrl:'/sign-in'})), TopBar (52px sticky role="banner" header)
-  - Task 3 (commit `ed8da18`): created `app/(app)/layout.tsx` (getUserIdOrNull → redirect to /sign-in), `app/(app)/tree/[treeId]/page.tsx` (force-dynamic RSC reading tree + people under RLS via supabaseServer(); null tree → AuthError variant="rls-reject"), `e2e/signin-bootstrap.spec.ts` (Playwright @clerk/testing/playwright flow with env-gated test.skip so CI stays green); installed @clerk/testing@2.0.17 (dev-dep, exact-pinned); Playwright Chromium browser installed to ~/Library/Caches/ms-playwright/
-  - `npx tsc --noEmit` clean; `npm run build` succeeded with 5 routes including `/tree/[treeId]`; `npx playwright test --list` discovered 1 test; no spec was actually run (env-gated, .env.local not populated)
-  - Duration: ~18 min
-  - Deferred: Playwright E2E run (requires populated .env.local + Clerk test user); visual render verification (same blocker); cross-user RLS isolation manual smoke
+- Executed Phase 2 Plan 01 (`/gsd-execute-phase 2`) — 4 tasks, sequential; two Rule-1 acceptance-criterion alignments (docblock comments pruned to pass grep assertions)
+  - Task 1 TDD (RED `7415f7b`, GREEN `6aec2b6`): created `lib/graph/edges.test.ts` (16 it-blocks), `lib/schemas/person.ts` (PersonPatchSchema.strict + GenderSchema + toDbPatch camelCase→snake_case), `lib/graph/edges.ts` (NODE_W=180, NODE_H=76, computeEdges verbatim port from handoff model.jsx L45-62 with sorted-pair spouse dedupe, spousePath canonical+midnode fallback, parentPath orthogonal)
+  - Task 2 (commit `6d05521`): created `app/actions/people.ts` — updatePerson, movePerson, removePerson Server Actions; all three call getUserIdOrThrow() at line 1 of body, scope via `.eq('id', personId).eq('tree_id', treeId)` (T-02-02 defense-in-depth), wrap errors with only `error.message` (T-02-04 leak prevention)
+  - Task 3 (commit `7550bb5`): extended `lib/store/tree-store.ts` — added Person/SaveState/PersonRowDb types, personFromRow boundary conversion, people/sidePanelOpen/draggingPersonId/dragOrigin/saveStateByPersonId state, 10 setters; temporal() wrapper preserved but drag/edit setters do NOT register past-states yet (D-06 Phase 3 delegation); file kept as .ts (no JSX) via React.createElement provider
+  - Task 4 (commit `1bf7778`): extended `app/globals.css` with `--gender-{m,f,x,u}` + `--save-{saved,error}-bg` in :root and `--color-*` in @theme; deleted `components/shell/SeedPersonNode.tsx` + `components/shell/GridBackground.tsx` (D-08); pruned imports + stale docblocks from `app/(app)/tree/[treeId]/page.tsx`; REQUIREMENTS.md CANV-01 56px→52px, CANV-02 8px/--ink-4→24px/--rule-soft; PROJECT.md Key Decisions row for D-08 pronouns note
+  - `npx tsc --noEmit` clean; `npx next build` succeeded (5 routes, Compiled successfully in 2.1s); `npx vitest run` 16 passed + 3 skipped (RLS env-gated); phase-level grep 50 matches (threshold ≥20)
+  - Duration: 8 min
+  - Requirements marked complete: EDGE-01, DESIGN-01
 
 ### Next Session
 
-Phase 1 is code-complete (4/4 plans, 5 routes built). Ready for verification:
+Plan 02-01 is complete. Data plumbing ready for Wave 2:
 
-1. User populates `.env.local` with 7 runtime env vars (Clerk pk/sk + Supabase URL/key + Clerk SIGN_IN_URL / SIGN_UP_URL + optional CLERK_JWT_KEY)
-2. User confirms Clerk Dashboard configuration (Google/Apple/email providers enabled, Supabase native third-party auth activated, /sign-in and /sign-up paths registered — per 01-03 SUMMARY Clerk Dashboard table)
-3. User runs `npm run dev` → signs in → verifies 52px topbar + inline tree rename + switcher + avatar menu + seed YOU node + empty-tree greeting
-4. (Optional) User creates a Clerk test user with password strategy + sets E2E_CLERK_USER_USERNAME / E2E_CLERK_USER_PASSWORD → runs `npx playwright test e2e/signin-bootstrap.spec.ts` for the full automated flow
-5. Once verified, Phase 2 planning can begin (Canvas, Nodes & Edit — pan/zoom canvas, PersonNode rendering, SidePanel with auto-save pill).
+1. **Plan 02-02** (canvas render): `<TreeCanvas>` + `<PanZoomWrapper>` + `<EdgeLayer>` + `<PersonNode>` + `<AvatarCircle>` — consumes `NODE_W`/`NODE_H`/`computeEdges`/`spousePath`/`parentPath` from `lib/graph/edges.ts`, subscribes to `useTreeStore(s => s.people[id])` for per-person selectors, mounts inside `app/(app)/tree/[treeId]/page.tsx` where the placeholder comment now sits.
+2. **Plan 02-03** (save pipeline + side panel): `<SidePanel>` + field components + `<SavePill>` + `<SaveErrorToast>` + `useSaveQueue` hook — consumes `PersonPatchSchema`/`PersonPatch`/`toDbPatch` from `lib/schemas/person.ts` and `updatePerson`/`movePerson`/`removePerson` from `app/actions/people.ts`.
+3. Phase 2 end: verify cross-user RLS isolation on people mutations (`updatePerson` under a shared tree as editor vs viewer — should fail for viewer).
 
 ### Context Notes
 

@@ -60,7 +60,7 @@ Plans:
   5. Colors, typography, spacing, radii, shadows, and lucide icons match the handoff styles.css pixel-for-pixel
 **Plans:** 3 plans
 Plans:
-- [ ] 02-01-PLAN.md — Phase 2 foundation: Zod schemas, Server Actions (updatePerson/movePerson/removePerson), pure computeEdges utility + Vitest, Zustand TreeState extensions, @theme gender + save-state tokens, D-08 grooming (delete SeedPersonNode + GridBackground, fix REQUIREMENTS.md typos)
+- [x] 02-01-PLAN.md — Phase 2 foundation: Zod schemas, Server Actions (updatePerson/movePerson/removePerson), pure computeEdges utility + Vitest, Zustand TreeState extensions, @theme gender + save-state tokens, D-08 grooming (delete SeedPersonNode + GridBackground, fix REQUIREMENTS.md typos)
 - [ ] 02-02-PLAN.md — Canvas shell: TreeStoreProvider at layout, widened RSC select, TreeCanvas + PanZoomWrapper (pan / Cmd-zoom / 3px-threshold drag with movePerson commit), EdgeLayer (single SVG + non-scaling stroke), PersonNode (180×76 card + avatar + gender stripe + is-me ribbon), AvatarCircle
 - [ ] 02-03-PLAN.md — Save pipeline + SidePanel: useSaveQueue (serial per-person queue + 400ms debounce + retry), FieldInput/FieldTextarea/GenderSelect, RelationsList, SavePill (5 states), SaveErrorToast (4.4s auto-dismiss), SidePanel (380px dock + window.confirm Remove hidden for is_me)
 **UI hint:** yes
@@ -137,7 +137,7 @@ Phase 4 depends only on Phase 3 (needs edges + history). Phase 5 depends on Phas
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-04-21 |
-| 2. Canvas, Nodes & Edit | 0/TBD | Not started | — |
+| 2. Canvas, Nodes & Edit | 1/3 | In Progress | — |
 | 3. Authoring & History | 0/TBD | Not started | — |
 | 4. Tidy & Layout | 0/TBD | Not started | — |
 | 5. Share & Realtime | 0/TBD | Not started | — |

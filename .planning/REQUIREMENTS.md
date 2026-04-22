@@ -45,7 +45,7 @@
 - [ ] **NODE-04**: Hover state: shadow lifts, border darkens
 - [ ] **NODE-05**: Selected state: 2px `--accent` border + visible `+` button anchored bottom-right
 - [ ] **NODE-06**: User can drag a node to reposition (canvas-space, respects zoom); mouseup commits to history
-- [ ] **EDGE-01**: `computeEdges(people)` pure function derives edges from relationship arrays — edges never stored
+- [x] **EDGE-01**: `computeEdges(people)` pure function derives edges from relationship arrays — edges never stored
 - [ ] **EDGE-02**: Single `<svg>` overlay beneath node layer renders all edges (not one SVG per edge)
 - [ ] **EDGE-03**: Spouse edges render as horizontal lines between nodes at same y
 - [ ] **EDGE-04**: Parent–child edges render as orthogonal paths (down from parent-pair midpoint, across, down into child)
@@ -136,7 +136,7 @@
 - [ ] **A11Y-01**: All interactive controls have focus rings and ARIA labels
 - [ ] **A11Y-02**: Keyboard shortcut scope is correct (typing in a field does not trigger canvas Cmd-Z)
 - [ ] **A11Y-03**: Tab order: topbar → canvas container → toolbar → side panel (when open)
-- [ ] **DESIGN-01**: Colors, typography, spacing, radii, shadows match design tokens in handoff `styles.css` exactly
+- [x] **DESIGN-01**: Colors, typography, spacing, radii, shadows match design tokens in handoff `styles.css` exactly
 - [ ] **DESIGN-02**: Inline icons replaced 1:1 with `lucide-react` equivalents (User, Plus, X, Undo2, Redo2, Maximize2, Sparkles, Share2, Trash2, ExternalLink, …)
 - [x] **DESIGN-03**: Tailwind v4 `@theme` maps handoff `:root` CSS variables directly (no drift between prototype and app)
 
@@ -239,7 +239,7 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 | NODE-04 | Phase 2 | Pending |
 | NODE-05 | Phase 2 | Pending |
 | NODE-06 | Phase 2 | Pending |
-| EDGE-01 | Phase 2 | Pending |
+| EDGE-01 | Phase 2 | Complete |
 | EDGE-02 | Phase 2 | Pending |
 | EDGE-03 | Phase 2 | Pending |
 | EDGE-04 | Phase 2 | Pending |
@@ -262,7 +262,7 @@ Every v1 requirement maps to exactly one phase. See ROADMAP.md for phase goals a
 | SAVE-03 | Phase 2 | Pending |
 | SAVE-04 | Phase 2 | Pending |
 | ERR-01 | Phase 2 | Pending |
-| DESIGN-01 | Phase 2 | Pending |
+| DESIGN-01 | Phase 2 | Complete |
 | DESIGN-02 | Phase 2 | Pending |
 | RAD-01 | Phase 3 | Pending |
 | RAD-02 | Phase 3 | Pending |
