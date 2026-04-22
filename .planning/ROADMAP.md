@@ -58,7 +58,11 @@ Plans:
   3. I can click a node to select it, drag it to reposition, double-click (or press Enter) to open the side panel, and edit Name / gender / pronouns / life fields with my changes persisting on server ACK
   4. The auto-save pill flips green ONLY after the server confirms — never on optimistic commit — and turns red with a "Couldn't save" toast + Retry when a save fails
   5. Colors, typography, spacing, radii, shadows, and lucide icons match the handoff styles.css pixel-for-pixel
-**Plans:** TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — Phase 2 foundation: Zod schemas, Server Actions (updatePerson/movePerson/removePerson), pure computeEdges utility + Vitest, Zustand TreeState extensions, @theme gender + save-state tokens, D-08 grooming (delete SeedPersonNode + GridBackground, fix REQUIREMENTS.md typos)
+- [ ] 02-02-PLAN.md — Canvas shell: TreeStoreProvider at layout, widened RSC select, TreeCanvas + PanZoomWrapper (pan / Cmd-zoom / 3px-threshold drag with movePerson commit), EdgeLayer (single SVG + non-scaling stroke), PersonNode (180×76 card + avatar + gender stripe + is-me ribbon), AvatarCircle
+- [ ] 02-03-PLAN.md — Save pipeline + SidePanel: useSaveQueue (serial per-person queue + 400ms debounce + retry), FieldInput/FieldTextarea/GenderSelect, RelationsList, SavePill (5 states), SaveErrorToast (4.4s auto-dismiss), SidePanel (380px dock + window.confirm Remove hidden for is_me)
 **UI hint:** yes
 
 ### Phase 3: Authoring & History
