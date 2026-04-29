@@ -1,12 +1,13 @@
 ---
 phase: 3
 slug: authoring-history
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-29
 revised: 2026-04-29
 revision_iteration: 1
+reviewed_at: 2026-04-29
 ---
 
 # Phase 3 — UI Design Contract
