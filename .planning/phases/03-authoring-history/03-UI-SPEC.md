@@ -5,6 +5,8 @@ status: draft
 shadcn_initialized: false
 preset: none
 created: 2026-04-29
+revised: 2026-04-29
+revision_iteration: 1
 ---
 
 # Phase 3 — UI Design Contract
@@ -101,8 +103,8 @@ These are verbatim-from-handoff pixel values tied to specific classes. Do not in
 | Radial button text color (idle) | `--ink` | Inherited via parent button reset |
 | Radial appear animation | `opacity 0 → 1, transform translate(-50%,-50%) scale(0.6) → scale(1)` over `0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2)` | Handoff `.radial-btn` L253-255 + `.radial.open .radial-btn` L257 |
 | Radial dismiss animation | reverse — `0.15s ease` | Handoff fallback transition |
-| Radial symbol | Mono 18px 500 weight: `↑` Parent / `↔` Spouse / `↓` Child / `←` Sibling (`<additional_context>` says `← or →` for Sibling — pick `←` for left position) | Handoff `.radial-btn-icon` L263-267 |
-| Radial label | Mono 8px uppercase 0.08em tracking | Handoff `.radial-btn-label` L268-273 |
+| Radial symbol | Mono 18px 400 weight: `↑` Parent / `↔` Spouse / `↓` Child / `←` Sibling (`<additional_context>` says `← or →` for Sibling — pick `←` for left position) | Handoff `.radial-btn-icon` L263-267 (weight normalised from handoff 500 → 400 to honour the 2-weight typography contract; visual prominence is carried by the 18px size + JetBrains Mono geometry) |
+| Radial label | Mono 11px uppercase 0.08em tracking | Handoff `.radial-btn-label` L268-273 (size raised from handoff 8px → 11px to consolidate onto the existing Mono micro size; at 11px monospace inside a 56px button the label remains compact and the uppercase 0.08em tracking is preserved) |
 | Toolbar position | `bottom: 20px, left: 50%, translateX(-50%)` | Handoff `.toolbar` L334-339 |
 | Toolbar background | `--bg-card` | Handoff `.toolbar` L339 |
 | Toolbar border | 1px `--ink` | Handoff `.toolbar` L340 |
@@ -150,19 +152,20 @@ These are verbatim-from-handoff pixel values tied to specific classes. Do not in
 
 ## Typography
 
-Inherited from Phase 1 + 2; Phase 3 reuses only, no new sizes.
+Inherited from Phase 1 + 2; Phase 3 reuses only, no new sizes. Contract: **4 sizes (11 / 13 / 14 / 18) and 2 weights (400 / 600) — no exceptions.**
 
 | Role | Font | Size | Weight | Line Height | Phase 3 usage |
 |------|------|------|--------|-------------|---------------|
+| Mono micro | JetBrains Mono | 11px | 400 | 1.2 | Toolbar zoom-readout; relation hint in search-palette result rows ("PARENT · OF YOU", uppercase 0.06em); **radial button caption labels (`PARENT`, `SPOUSE`, `CHILD`, `SIBLING`) — uppercase 0.08em tracking** |
+| Label / emphasis | Inter | 13px | 600 | 1.3 | Toast Undo / Retry button label; search-palette empty-state heading (toolbar tooltip text exists only as `aria-label`, not a visible 13px element) |
 | Body | Inter | 14px | 400 | 1.5 | Toast message text; search-palette result row name (primary); modal body paragraphs |
-| Label / emphasis | Inter | 13px | 600 | 1.3 | Toolbar button tooltip text (rendered via `aria-label`, not visible); toast Undo / Retry button label; search-palette empty-state heading |
-| Mono micro | JetBrains Mono | 11px | 400 | 1.2 | Toolbar zoom-readout; search-palette result-row relation hint ("Spouse · Olivia's mother", uppercase 0.06em) |
-| Mono symbol | JetBrains Mono | 18px | 500 | 1 | Radial button center symbol (↑↔↓←) |
-| Mono micro-mini | JetBrains Mono | 8px | 400 | 1 | Radial button caption label (`PARENT`, `SPOUSE`, `CHILD`, `SIBLING`) — uppercase 0.08em tracking |
+| Mono symbol | JetBrains Mono | 18px | 400 | 1 | Radial button center symbol (↑↔↓←) — visual prominence carried by the 18px size + JetBrains Mono geometry, not a weight bump |
 
 **Toolbar buttons are icon-only.** No visible text label; lucide icon at 16px owns the glyph slot. Tooltip via `aria-label` only — visible tooltip on hover deferred to v2 (a `title` attribute is acceptable for v1 but not styled).
 
 **Search-palette result hint:** mono 11px uppercase 0.06em — matches handoff `.role-select` letter-spacing. Format: `{RELATION} · {QUALIFIER}` where RELATION = one of `PARENT`, `SPOUSE`, `CHILD`, `SIBLING`, `SELF`, `RELATIVE`, and QUALIFIER is short context like `OF YOU`, `OF ALICE` for parents/spouses, omitted for distant relations. Example: `PARENT · OF YOU` for the user's parent.
+
+**Radial button caption labels:** rendered at the same 11px Mono size as the relation hint, with `text-transform: uppercase` and `letter-spacing: 0.08em`. At 11px monospace inside a 56px button the four labels (`PARENT`, `SPOUSE`, `CHILD`, `SIBLING`) remain compact; the symbol-and-label vertical rhythm inside the button is symbol (18px) on top, label (11px) below, separated by the 4px label-to-symbol gap.
 
 ---
 
@@ -224,14 +227,14 @@ The delete toast uses the standard ink-fill toast appearance — **NOT** danger 
 
 | Element | Copy |
 |---------|------|
-| Parent button symbol | `↑` (mono 18px) |
-| Parent button label | `PARENT` (mono 8px caps, 0.08em tracking) |
-| Spouse button symbol | `↔` (mono 18px) |
-| Spouse button label | `SPOUSE` |
-| Child button symbol | `↓` (mono 18px) |
-| Child button label | `CHILD` |
-| Sibling button symbol | `←` (mono 18px) |
-| Sibling button label | `SIBLING` |
+| Parent button symbol | `↑` (mono 18px 400) |
+| Parent button label | `PARENT` (mono 11px 400 caps, 0.08em tracking) |
+| Spouse button symbol | `↔` (mono 18px 400) |
+| Spouse button label | `SPOUSE` (mono 11px 400 caps, 0.08em tracking) |
+| Child button symbol | `↓` (mono 18px 400) |
+| Child button label | `CHILD` (mono 11px 400 caps, 0.08em tracking) |
+| Sibling button symbol | `←` (mono 18px 400) |
+| Sibling button label | `SIBLING` (mono 11px 400 caps, 0.08em tracking) |
 | Parent button `aria-label` | `Add parent for {name}` (interpolated with anchor person's display name) |
 | Spouse button `aria-label` | `Add spouse for {name}` |
 | Child button `aria-label` | `Add child for {name}` |
@@ -255,14 +258,16 @@ Failure path: pill on the anchor person flips to `error` and the standard SaveEr
 
 | Button | `aria-label` | Disabled when |
 |--------|--------------|---------------|
-| Undo | `Undo` (or `Undo last action` if checker prefers explicitness) | `temporal.pastStates.length === 0` |
-| Redo | `Redo` | `temporal.futureStates.length === 0` |
+| Undo | `Undo last action` | `temporal.pastStates.length === 0` |
+| Redo | `Redo last action` | `temporal.futureStates.length === 0` |
 | Zoom out | `Zoom out` | `transform.k <= 0.25` |
 | Zoom readout | (no aria-label — text content `{Math.round(k * 100)}%` is self-descriptive) | never (always rendered as text) |
 | Zoom in | `Zoom in` | `transform.k >= 4` |
 | Fit to view | `Fit to view` | never |
 | Tidy | `Tidy layout` | **always disabled in Phase 3** — Phase 4 wires this. Visual: 0.3 opacity, cursor `not-allowed`, no click handler. |
 | Panel toggle | `Show person details` (when closed) / `Hide person details` (when open) | when no person is selected (`selectedPersonId === null`) |
+
+**Toast inline-undo button label stays `Undo`** — established Phase 2 convention for inline action buttons inside toasts (matches the pattern `<accent text> · short imperative verb`). The toolbar `Undo last action` label is for the persistent toolbar control; the toast `Undo` is the inline reversal affordance attached to the just-fired action. They are different surfaces.
 
 ### Search Palette
 
@@ -274,7 +279,7 @@ Failure path: pill on the anchor person flips to `error` and the standard SaveEr
 | Empty state — no people in tree | (Should be impossible at Phase 3 entry since the user has at minimum a `is_me` seed person. Defensive copy:) `Add someone to start searching.` |
 | Empty state — no results match query | `No matches for "{query}"` |
 | Result row format | `{name}` (Inter 14px 600) on top line; `{RELATION HINT}` (mono 11px 0.06em ink-3) on second line; 40px AvatarCircle on left |
-| Result row keyboard hint (footer of modal) | `↑↓ navigate · Enter select · Esc close` (mono 10px caps, 0.08em tracking, ink-3) |
+| Result row keyboard hint (footer of modal) | `↑↓ navigate · Enter select · Esc close` (mono 11px caps, 0.08em tracking, ink-3) |
 | Selecting a result | Closes palette, selects person, recenters canvas (300ms ease-out tween), opens nothing (does NOT auto-open the side panel — per REQUIREMENTS SRCH-02) |
 | Centered toast after selection | `Centered on {name}` (2.2s dwell, no action button) |
 
@@ -392,8 +397,8 @@ Total width: 40+40+1+40+60+40+40+1+40+40 = 342px. Toolbar fills only the content
 
 | Button (left to right) | Icon | aria-label | Action | Disabled when |
 |---|---|---|---|---|
-| Undo | `Undo2` (lucide, 16px) | `Undo` | `temporal.undo()` | `pastStates.length === 0` |
-| Redo | `Redo2` (lucide, 16px) | `Redo` | `temporal.redo()` | `futureStates.length === 0` |
+| Undo | `Undo2` (lucide, 16px) | `Undo last action` | `temporal.undo()` | `pastStates.length === 0` |
+| Redo | `Redo2` (lucide, 16px) | `Redo last action` | `temporal.redo()` | `futureStates.length === 0` |
 | (divider, 1px wide, 24px tall, `--rule`) | — | — | — | — |
 | Zoom out | `ZoomOut` (lucide, 16px) | `Zoom out` | `setTransform({ ...t, k: clamp(t.k * 0.8, 0.25, 4) })` (anchored on viewport center, NOT cursor — toolbar buttons are non-cursor zoom) | `transform.k <= 0.25` |
 | Zoom readout | (text-only) | (none) | (display only — `{Math.round(transform.k * 100)}%`) | (always shown) |
@@ -615,6 +620,8 @@ The `partialize` config means only `people` (the relationship-bearing data) is i
 | Radial button bg idle | `--bg-card` | Handoff L246 | ✓ matches |
 | Radial button bg hover | `--accent-soft` | REQUIREMENTS RAD-02 (overrides handoff `--ink` invert) | ~ deliberate per REQ |
 | Radial button transition | `transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2)` | Handoff L253 | ✓ matches |
+| Radial symbol weight | 400 (handoff says 500) | Typography contract: max 2 weights — visual prominence carried by 18px size | ~ deliberate normalisation |
+| Radial label size | 11px (handoff says 8px) | Typography contract: max 4 sizes — consolidated onto Mono micro 11px row | ~ deliberate normalisation |
 | Toolbar position | `bottom: 20px, left: 50%, translateX(-50%)` | Handoff L334-339 | ✓ matches |
 | Toolbar bg | `--bg-card` | Handoff L339 | ✓ matches |
 | Toolbar border | 1px `--ink` | Handoff L340 | ✓ matches |
@@ -653,13 +660,13 @@ The `partialize` config means only `people` (the relationship-bearing data) is i
 
 | Requirement | Implementation |
 |-------------|----------------|
-| **A11Y-01: Focus rings + ARIA labels on all interactives** | Every new control inherits the global `*:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }`. Each radial button: `aria-label="Add {kind} for {anchor name}"`. Each toolbar button: `aria-label="Undo"` / etc. (see Toolbar table). Search palette input: `aria-label="Search people in this tree by name"`. Toast action buttons: `aria-label="Undo last action"` (or contextual per type). |
+| **A11Y-01: Focus rings + ARIA labels on all interactives** | Every new control inherits the global `*:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }`. Each radial button: `aria-label="Add {kind} for {anchor name}"`. Toolbar Undo / Redo: `aria-label="Undo last action"` / `aria-label="Redo last action"` (see Toolbar table for the rest). Search palette input: `aria-label="Search people in this tree by name"`. Toast inline-undo button keeps the label `Undo` (Phase 2 toast convention) — distinct from the toolbar's `Undo last action`. |
 | **A11Y-02: Shortcut scope correctness** | The single keyboard listener (mounted at TreeCanvas level) checks `document.activeElement` for `INPUT`, `TEXTAREA`, or `[contenteditable="true"]` before dispatching ⌘Z, ⌘⇧Z, ⌘Y, ⌘K, ⌘F. If active element is an editable text field, the listener returns immediately. Native input behaviors (browser undo, Find-in-page) run unimpeded. |
 | **A11Y-03: Tab order** | topbar → canvas section → toolbar → side panel. Lock from Section "Tab order" above. Toolbar uses `<div role="toolbar" aria-label="Canvas controls">` for SR landmark navigation. |
 | Radial menu announcement | `<div role="menu" aria-label="Add relative for {name}">` wrapping the 4 buttons. Each button: `role="menuitem"`. |
 | Search palette announcement | `<div role="dialog" aria-modal="true" aria-label="Search people">`. Input: `aria-controls="search-results"`. Result list: `<ul id="search-results" role="listbox">`. Each result row: `role="option" aria-selected={isKeyboardActive}`. Focus management on open: input gets `.focus()`. Focus restoration on close: previously-focused element regains focus. |
 | Toast announcement | Each toast: `role="status"` + `aria-live="polite"` for confirmations / inline-undo; `role="alert"` + `aria-live="assertive"` for save errors. Toast region wrapper: `<div aria-label="Notifications" role="region">`. |
-| Disabled buttons | `aria-disabled="true"` on disabled toolbar buttons (Undo when no history, Tidy in Phase 3, Panel-toggle when no selection). Button is still focusable via Tab so SR users can hear "Undo, dimmed". |
+| Disabled buttons | `aria-disabled="true"` on disabled toolbar buttons (Undo when no history, Tidy in Phase 3, Panel-toggle when no selection). Button is still focusable via Tab so SR users can hear "Undo last action, dimmed". |
 | Color contrast | Toast text 13px `--bg` on `--ink` ≈ 16:1 AAA. Toolbar idle icon `--ink-2` on `--bg-card` ≈ 8:1 AA. Toolbar disabled `--ink-2` at 0.3 opacity on `--bg-card` ≈ 2.4:1 — fails AA, BUT the disabled state is conventionally exempt from WCAG (1.4.3 carve-out). Decorative-only failure tolerated for v1. Search palette result name 14px `--ink` on `--bg-card` ≈ 14:1 AAA. |
 | Reduced motion | Inherited global `prefers-reduced-motion`. Specifically affected: radial scale-in tween → instant; toast slide-in → instant; modal popIn → instant; recenter-on-search-pick canvas pan → instant. The 6s inline-undo dwell is NOT a motion property — it remains 6000ms regardless of motion preference. |
 | Screen-reader-only labels | Toolbar zoom readout text (`100%`) is announced as text. The percent symbol is announced fine; no SR-only override needed. |
@@ -734,6 +741,12 @@ These are points where REQUIREMENTS, handoff, and `<user_decisions>` did not con
 - Locked interaction contracts for radial menu, add-relative authoring, undo/redo via zundo (100-entry cap), toolbar (8 buttons), inline-undo delete (6s dwell), search palette (520px modal at top:120px, Cmd-K invocation), generic toast infra.
 - Encoded all 4 `<user_decisions>` as locked: history cap 100, drag coalesces to 1 entry on mouseup, delete uses inline undo not modal, search is centered modal at top:120px width 520px.
 - Flagged 15 Open Questions for planner review — all have defensible defaults applied.
+
+**2026-04-29 — Revision 1 (gsd-ui-checker BLOCKED on Dimension 4 Typography).**
+- **Issue 1 — Too many font sizes (5 → 4).** Merged the 8px "Mono micro-mini" row into the existing 11px "Mono micro" row. Radial button caption labels (`PARENT`, `SPOUSE`, `CHILD`, `SIBLING`) now render at 11px JetBrains Mono 400 with the existing uppercase 0.08em tracking preserved. Updated: Typography table; component-constants table (Radial label row); Copywriting Contract → Radial Add Menu table; Pixel-Parity Checklist (added "Radial label size" row). Final type contract: 4 sizes (11 / 13 / 14 / 18).
+- **Issue 2 — Too many font weights (3 → 2).** Changed Mono symbol weight from 500 → 400. Visual prominence is carried by the 18px size + JetBrains Mono geometry, not the 100-unit weight bump. Updated: Typography table; component-constants table (Radial symbol row); Copywriting Contract → Radial Add Menu table (symbol rows now read "mono 18px 400"); Pixel-Parity Checklist (added "Radial symbol weight" row). Final weight contract: 400 (all body + all mono) and 600 (Inter emphasized labels).
+- **Issue 3 — Aria-label inconsistency (FLAG, fixed).** Standardised toolbar Undo / Redo aria-labels to `Undo last action` / `Redo last action` across all three locations: Copywriting Contract toolbar tooltip table, Toolbar interaction-contract button table, A11Y-01 row of the Accessibility Contract. Toast inline-undo button label remains `Undo` (Phase 2 toast convention) — explicit note added in both the Copywriting and A11Y rows so the planner does not accidentally collapse them.
+- No other sections touched. All other contracts (color, spacing, registry safety, motion, interaction flows) unchanged.
 
 ---
 
