@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-04-22T10:40:43.167Z"
+status: verifying
+last_updated: "2026-05-07T21:41:08.477Z"
 progress:
   total_phases: 5
   completed_phases: 2
@@ -133,7 +133,36 @@ None currently. User approval of the roadmap is the only gate to beginning Phase
 
 ## Session Continuity
 
-### Last Session — 2026-04-22 (full Phase 2 execute + verify + quick-fix + Phase 3 planning pause)
+### Last Session — 2026-05-07 (Phase 3 discuss-phase resumed and completed)
+
+**TL;DR:** Resumed Phase 3 discuss from the 2026-04-29 checkpoint (1/3 areas done, paused on undo failure UX). Confirmed UI-SPEC's drafted defaults for the in-flight question; deferred two Area-2 sub-questions and one Area-3 sub-question to planner discretion (with recommendations). Three Area-3 questions resolved in one batch. Phase 3 CONTEXT.md + DISCUSSION-LOG.md committed (`903877b`). Checkpoint cleaned up.
+
+- Areas 1 + 2 + 3 all locked. CONTEXT.md captures 37 implementation decisions (D-01..D-37) including 8 explicit Claude's-discretion items with planner recommendations.
+- Failure UX for inverse Server Action rejection: optimistic-local revert + per-person red pill + single `Couldn't sync history` toast (4400ms, Retry).
+- Server action shape for Add-relative: single atomic `addPerson(treeId, kind, anchorId, position)` writing symmetric relations in one txn.
+- Parent-cap edge case: server rejects → SaveErrorToast `Couldn't add parent — already has two`.
+- Phase 3 'complete' gate is the full demo path (Playwright E2E + manual smoke + Vitest for pure utils).
+
+### Next Session — run this exact command first
+
+```
+/clear
+/gsd-plan-phase 3
+```
+
+Phase 3 plans should split coarsely (1-3 PLAN.md files). UI-SPEC §Component Inventory + CONTEXT.md D-30 suggest a natural split: (1) radial menu + add-relative pipeline + collision-nudge, (2) zundo wiring + history replay + toolbar + generic toast infra, (3) search palette + inline-undo Delete + a11y sweep. Planner has final call.
+
+**Do not:**
+
+- Auto-chain `/gsd-plan-phase 3` → `/gsd-execute-phase 3` in one TUI session. Plan phase prompts can be interactive.
+- Try to clear Phase 2 HUMAN-UAT items before Phase 3 ships radial-add.
+- Fix Phase 2 code-review warnings in the same session as Phase 3 planning. Keep `/gsd-code-review-fix 02` separate.
+
+### Previous Session — 2026-04-29 (Phase 3 UI-SPEC + discuss-phase Areas 1+2 partial)
+
+UI-SPEC authored, reviewed, revised once (Typography 4 sizes / 2 weights + aria-label fixes), and approved (`3f2b67e`). Discuss-phase started; Area 1 (boundary + demo path) locked; Area 2 paused mid-way on the inverse-Server-Action-rejection UX question. Checkpoint persisted at `03-DISCUSS-CHECKPOINT.json`.
+
+### Previous Session — 2026-04-22 (full Phase 2 execute + verify + quick-fix + Phase 3 planning pause)
 
 **TL;DR:** Phase 2 shipped code-complete, verified automated, HUMAN-UAT persisted but deferred. Quick-task 260422-9vu fixed 3 runtime bugs discovered at smoke-test. Phase 3 planning started but paused at UI-SPEC gate per user direction.
 
@@ -170,6 +199,7 @@ Then (top-level, NOT nested — TUI prompts break in nested Task calls):
 Phase 3 must ship radial-add (RAD-01..03 + ADD-01..04) before Phase 2 HUMAN-UAT becomes testable — most UAT items need a 2+ person tree.
 
 **Do not:**
+
 - Try to finish Phase 2 HUMAN-UAT in the next session. It's blocked by Phase 3.
 - Auto-chain the three TUI commands above — they must run at the top level.
 - Fix the 6 `02-REVIEW.md` warnings in the same session as Phase 3 planning. Keep polish separate.
