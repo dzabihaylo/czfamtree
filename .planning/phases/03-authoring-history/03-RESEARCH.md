@@ -826,32 +826,37 @@ const handleResultPick = (personId: string) => {
 
 **Risk summary:** Most assumptions are low-risk implementation choices that the planner can confirm during plan-writing. The only one flagged for active user confirmation is **A1** (atomicity model for `addPerson`) since CONTEXT.md D-09 says "atomic" and the two-write pattern is technically not atomic without an RPC.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Atomic `addPerson` via SECURITY DEFINER RPC vs. two-write with compensating delete**
    - What we know: CONTEXT.md D-09 says atomic; PostgREST doesn't expose transactions; existing `bootstrap_tree` RPC is the precedent for atomic multi-write Server Actions
    - What's unclear: whether the two-write rollback-on-error is acceptable as v1, OR whether the planner should add a 0003 migration creating `add_person_with_relation()` RPC
    - Recommendation: ship the RPC. Migration cost is ~15 LOC of SQL; matches D-09 verbatim; eliminates A1 risk. Planner adds a Wave 1 task `[BLOCKING] supabase migration + db push` analogous to Phase 1 D-05.
+   - **RESOLVED:** shipped as the `add_person_with_relation` SECURITY DEFINER RPC in Plan 01 Task 2 (migration `20260507180701_add_person_with_relation.sql`); D-09 atomicity guarantee held.
 
 2. **`useSaveQueue` extension API for inverse Server Action replay (D-06 finalization)**
    - What we know: D-06 recommends routing through queue; queue API is `enqueueField/enqueueMove/flush/retry`
    - What's unclear: exact method shape — `enqueueInverse(personId, prevFields)` vs reusing `enqueueField` with a force-immediate flag vs a new `useHistoryReplay()` hook
    - Recommendation: simplest is a new `enqueueInverse` method that merges `prevFields` into `pending` and triggers `runSave` without debounce. ~10 LOC addition.
+   - **RESOLVED:** implemented in Plan 03 Task 2 — `enqueueInverse(personId, prevFields)` method added to `lib/hooks/useSaveQueue.ts`; consumed by `useHistoryReplay` diff loop in `lib/hooks/useSaveErrorToast.ts` per D-06.
 
 3. **Search palette result list virtualization threshold (D-31)**
    - What we know: UI-SPEC §5 says max-height `min(60vh, 400px)`; rows are 56px (~7 visible)
    - What's unclear: whether to virtualize via `react-virtuoso` or hand-roll IntersectionObserver
    - Recommendation: NO virtualization for Phase 3. Trees in v1 will likely have <50 people; rendering 50 rows with `.filter` is microsecond-cost. Add virtualization in v2 only if user feedback flags slow palettes on 500+ person trees.
+   - **RESOLVED:** deferred per recommendation — Phase 3 ships no virtualization; revisit only if Phase 5+ user feedback flags slow palettes on 500+ person trees (v2 concern, not v1).
 
 4. **Modal `top: 120px` on small viewports (D-37 / UI-SPEC Open Q #13)**
    - What we know: 120px + 60vh max-height pushes modal below 600px viewports
    - What's unclear: whether to clamp `top` to `min(120px, max(20px, vh * 0.15))` in CSS or defer to v2
    - Recommendation: ship the clamp. One-line CSS change (`top: clamp(20px, 15vh, 120px)`); zero implementation cost; resolves the open question without v2 deferral.
+   - **RESOLVED:** clamp implemented in Plan 04 Task 2 (Step 0) — `components/ui/Modal.tsx` updates the `marginTop` style to `clamp(20px, 15vh, ${topOffset}px)` when topOffset is provided; SearchPalette inherits the clamp automatically by passing the locked `topOffset={120}` (D-20). Acceptance criterion `grep -q 'clamp(20px, 15vh,' components/ui/Modal.tsx` enforces the change.
 
 5. **Auto-focus Name field on add-relative — distinguishable from auto-focus on double-click**
    - What we know: ADD-03 mandates auto-focus on add; double-click panel-open should NOT steal focus from the canvas
    - What's unclear: implementation pattern (one-shot store flag, ref propagation, autoFocus prop)
    - Recommendation: add a transient `autoFocusNameOnNextMount: boolean` flag in the store. `addRelativeFlow` sets it to true after add success; SidePanel reads it on mount, focuses the Name input, sets back to false. Double-click panel-open does NOT set the flag, so focus stays on the canvas.
+   - **RESOLVED:** implemented per recommendation in Plan 02 — `autoFocusNameOnNextMount: boolean` transient flag added to `lib/store/tree-store.ts` (Task 1), set to true by RadialMenu pick handler on success (Task 2), one-shot consumed by SidePanel mount effect (Task 3). Double-click panel-open does NOT touch the flag; canvas focus is preserved.
 
 ## Environment Availability
 

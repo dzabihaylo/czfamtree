@@ -81,7 +81,12 @@ Plans:
   3. The bottom toolbar pill gives me undo/redo/zoom/fit/tidy/panel-toggle with disabled states when an action is unavailable, and toasts confirm "Added parent", "Centered on …", "Couldn't save"
   4. ⌘K / ⌘F opens a search palette listing all people in the tree; picking a result selects them and recenters the canvas
   5. Every interactive control has a visible focus ring and ARIA label; Tab cycles topbar → canvas → toolbar → side panel in that order
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 03-01-PLAN.md (wave 1) — Foundation: lib/graph/placement (collision-nudge), lib/graph/relations (BFS hint), addPerson Server Action + SECURITY DEFINER RPC migration [BLOCKING: supabase db push], components/ui/Modal primitive
+- [ ] 03-02-PLAN.md (wave 2) — Radial menu + add-relative pipeline: RadialMenu.tsx (4-button, 90px radius, --accent-soft hover), TreeState slice (radialOpenFor, autoFocusNameOnNextMount, optimistic add helpers), PersonNode + button wiring, SidePanel auto-focus on add
+- [ ] 03-03-PLAN.md (wave 3) — Undo/redo + toolbar + toast infra: zundo wired (limit 100, partialize people-only, equality shallow), drag pause/resume bracket, useSaveQueue.enqueueInverse, useHistoryReplay diff loop, useSaveErrorToast publisher hook, Toolbar (8 buttons + Tidy aria-disabled), ToastHost stacking up to 3 — sequentially after Plan 02 (shared file regions in lib/store/tree-store.ts and components/canvas/PanZoomWrapper.tsx)
+- [ ] 03-04-PLAN.md (wave 4) — Search palette + inline-undo Delete + a11y sweep + E2E: useTreeKeyboard (scope-aware ⌘Z/⌘⇧Z/⌘Y/⌘K/⌘F), SearchPalette (520px @ top:120px with relation hints, Modal small-viewport top clamp resolving RESEARCH Q4), SidePanel inline-undo Delete (drops window.confirm), RadialMenu Add success/failure toasts, canvas section ARIA wrapper, Phase 3 demo-path Playwright spec
 **UI hint:** yes
 
 ### Phase 4: Tidy & Layout
@@ -138,7 +143,7 @@ Phase 4 depends only on Phase 3 (needs edges + history). Phase 5 depends on Phas
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-04-21 |
 | 2. Canvas, Nodes & Edit | 1/3 | In Progress | — |
-| 3. Authoring & History | 0/TBD | Not started | — |
+| 3. Authoring & History | 0/4 | Not started | — |
 | 4. Tidy & Layout | 0/TBD | Not started | — |
 | 5. Share & Realtime | 0/TBD | Not started | — |
 
