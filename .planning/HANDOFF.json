@@ -1,0 +1,110 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-08T12:23:09.328Z",
+  "phase": "03",
+  "phase_name": "authoring-history",
+  "phase_dir": ".planning/phases/03-authoring-history",
+  "plan": 0,
+  "task": 0,
+  "total_plans": 4,
+  "total_tasks": 13,
+  "status": "planned_ready_to_execute",
+  "completed_tasks": [
+    {
+      "id": "03-research",
+      "name": "Phase 3 research (zundo API verification, file plan, open questions resolved)",
+      "status": "done",
+      "commit": "ff64c73"
+    },
+    {
+      "id": "03-patterns",
+      "name": "Pattern mapping (22 files classified, 18 in-repo analogs)",
+      "status": "done",
+      "commit": "f82aa76"
+    },
+    {
+      "id": "03-plan",
+      "name": "Phase 3 planning — 4 plans across 4 waves, plan-checker passed iteration 2/3",
+      "status": "done",
+      "commit": "f82aa76"
+    }
+  ],
+  "remaining_tasks": [
+    {
+      "id": "03-01",
+      "name": "Plan 1 (wave 1) — placement/relations utilities + addPerson Server Action + RPC migration + Modal primitive",
+      "status": "not_started",
+      "tasks": 3,
+      "blocking_step": "supabase db push must run AFTER migration write, BEFORE any task depends on RPC"
+    },
+    {
+      "id": "03-02",
+      "name": "Plan 2 (wave 2) — RadialMenu + optimistic add-relative pipeline + auto-focus Name on add",
+      "status": "not_started",
+      "tasks": 3,
+      "depends_on": ["03-01"]
+    },
+    {
+      "id": "03-03",
+      "name": "Plan 3 (wave 3) — zundo wiring + history replay + Toolbar + generic ToastHost",
+      "status": "not_started",
+      "tasks": 3,
+      "depends_on": ["03-01", "03-02"]
+    },
+    {
+      "id": "03-04",
+      "name": "Plan 4 (wave 4) — SearchPalette + inline-undo Delete + keyboard layer + a11y + Playwright E2E",
+      "status": "not_started",
+      "tasks": 4,
+      "depends_on": ["03-01", "03-02", "03-03"]
+    }
+  ],
+  "blockers": [],
+  "human_actions_pending": [
+    {
+      "action": "Run `npx supabase db push` after Plan 01 Task 2 writes the new migration",
+      "context": "Plan 01 introduces supabase/migrations/20260507180701_add_person_with_relation.sql (SECURITY DEFINER RPC). Plan 02 calls this RPC. Type-check + build will pass without the push (types come from config), but the runtime call will fail.",
+      "blocking": true
+    },
+    {
+      "action": "Phase 2 HUMAN-UAT (10 items in 02-HUMAN-UAT.md) becomes exercisable AFTER Phase 3 ships radial-add",
+      "context": "Most Phase 2 UAT items need 2+ people in a tree, which requires the add-relative loop. Defer until Phase 3 demo path is green.",
+      "blocking": false
+    },
+    {
+      "action": "Phase 2 code-review fixes (6 warnings in 02-REVIEW.md, 0 critical)",
+      "context": "WR-01 literal \\u2014 in JSX text, WR-02 sidepanel center-on math, WR-03 NaN handling on whitespace year input, etc. Run `/gsd-code-review-fix 02` separately — do NOT mix with Phase 3 work.",
+      "blocking": false
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "addPerson ships as SECURITY DEFINER RPC (not two-write Server Action)",
+      "rationale": "Atomic symmetric-relation patches per CONTEXT.md D-09. Migration cost is low; Phase 1 precedent (bootstrap_tree). Resolves RESEARCH Q1.",
+      "phase": "03"
+    },
+    {
+      "decision": "Wave structure bumped 1/2/2/3 → 1/2/3/4 (strictly sequential)",
+      "rationale": "Plans 02 and 03 share lib/store/tree-store.ts and components/canvas/PanZoomWrapper.tsx in non-overlapping regions. Prose-only ordering is unsafe for autonomous executors. Plan-checker iteration 1 BLOCKER fix.",
+      "phase": "03"
+    },
+    {
+      "decision": "Modal small-viewport clamp implemented in Plan 04 Task 2 Step 0",
+      "rationale": "RESEARCH Q4 recommended `clamp(20px, 15vh, 120px)` — one-line CSS. Implemented rather than deferred per planner discretion (D-37 was discretion).",
+      "phase": "03"
+    },
+    {
+      "decision": "Remove-person undo ships local-only in Phase 3; server-side restorePerson Server Action deferred to Phase 5",
+      "rationale": "D-03 specifies removePerson ↔ addPerson(id, fullRecord) but D-04 provides valid failure-UX fallback. Demo path (D-01) does NOT exercise the broken branch. Trade-off explicitly documented as T-03-23 with TODO marker in source + Plan 04 SUMMARY 'Known Debt → Phase 5' entry.",
+      "phase": "03"
+    },
+    {
+      "decision": "Phase 3 adds zero npm dependencies — all surfaces hand-rolled",
+      "rationale": "react-hot-toast, cmdk, react-hotkeys-hook, framer-motion, dialog libraries explicitly rejected. Tailwind v4 + handoff CSS variables; no new tokens. Confirmed by RESEARCH Standard Stack section.",
+      "phase": "03"
+    }
+  ],
+  "uncommitted_files": [],
+  "next_action": "/clear then /gsd-execute-phase 3 — runs all 4 plans sequentially (4 waves)",
+  "context_notes": "Phase 3 is the demo-path-gated phase per CONTEXT.md D-01. Execution must produce: (1) clickable + on selected node opens 4-button radial menu, (2) Parent/Spouse/Child/Sibling click writes via addPerson RPC and opens side panel with Name focused, (3) ⌘Z/⌘⇧Z undo/redo with input-scope gate, (4) ⌘K/⌘F search palette, (5) toolbar pill with disabled states, (6) Tab order topbar→canvas→toolbar→side panel. Playwright E2E in Plan 04 Task 4 IS the gate. The plan is committed-clean; resuming agent should read the four PLAN.md files in order before executing."
+}

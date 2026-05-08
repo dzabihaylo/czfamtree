@@ -1,109 +1,92 @@
-# Session Handoff — 2026-04-22
+# Session Handoff — 2026-05-08
 
 **Read this first in the next session before running any command.**
 
 ## Where things stand
 
-- **Phase 2 (Canvas, Nodes & Edit):** code-complete and committed. Automated verification passes (tsc 0, 16/3 vitest, build clean). HUMAN-UAT is **persisted but not executed** — blocked on Phase 3 radial-add shipping (most UAT items require 2+ people in a tree, which requires the ability to add a relative).
-- **Phase 3 (Authoring & History):** planning pipeline paused. User chose "full pipeline" path. Next step is `/gsd-ui-phase 3` (UI-SPEC gate). Empty phase directory exists at `.planning/phases/03-authoring-history/`.
-- **Working tree:** clean. Branch is `main`. 9 commits from this session (see "Session commits" below).
-
-## Decisions made this session
-
-1. **Phase 3 path choice: B — full pipeline.** The user explicitly chose `/gsd-ui-phase 3` → `/gsd-discuss-phase 3` → `/gsd-plan-phase 3` → `/gsd-execute-phase 3` over a split (3a unblocker + 3b polish). Honor this choice — do not re-litigate it next session.
-2. **Phase 2 is being treated as complete for code purposes** even though HUMAN-UAT items are pending. This was a deliberate compromise because the UAT can't be exercised without Phase 3's add-relative loop.
+- **Phase 3 (Authoring & History): planned and committed.** 4 PLAN.md files across 4 strictly-sequential waves. Plan-checker passed iteration 2/2 (one revision round). All 20 phase requirement IDs covered, all 37 CONTEXT.md decisions covered. Working tree clean.
+- **Phase 2:** code-complete and committed. Automated verification passes. HUMAN-UAT (10 items) still pending — blocked on Phase 3 radial-add shipping (most UAT items need 2+ people in a tree).
+- **Phase 1:** complete.
+- **Branch:** `main`, pushed to `origin/main` at handoff time. No uncommitted work.
 
 ## Next action (exact command to run)
 
 ```
-/gsd-ui-phase 3
-```
-
-After it completes:
-
-```
-/gsd-discuss-phase 3
-/gsd-plan-phase 3
+/clear
 /gsd-execute-phase 3
 ```
 
-Do NOT try to chain these — `/gsd-ui-phase` and `/gsd-discuss-phase` use interactive TUI prompts that break inside nested invocations. Run them as top-level commands one at a time.
+`/gsd-execute-phase` runs all 4 waves sequentially, committing per task. Local supabase must be running (`supabase status` first; `supabase start` if needed) — Plan 01 Task 2 runs `npx supabase db push` automatically as part of its action.
 
-## Feedback from user about my approach (apply going forward)
+After execution:
 
-The user was frustrated at the end of this session because Phase 2 shipped a "skeleton" — a canvas they could drag but couldn't add anyone to, with an undismissable "Getting Started" overlay and a `+` button wired to nothing. Their words: *"this doesn't feel like progress."*
+```
+/gsd-verify-work 3
+```
 
-**The root lesson:** passing automated verification is not the same as shipping user-visible value. Phase 2's boundary was badly drawn — it shipped infrastructure (canvas + save pipeline + side panel edit) without any trigger that makes the core product loop (add-relative) work.
+This walks the Playwright demo-path E2E + the 5 ROADMAP success criteria.
 
-**Apply in the next session:**
+## Phase 3 plan summary
 
-- If a phase boundary doesn't enable a usable user loop, flag it *before* declaring completion — not after. The verifier's `human_needed` UAT list should have tipped me off: most items required 2+ people to test, which wasn't possible from a fresh tree.
-- Measure "done" by what the user can actually do, not what tests pass.
-- Name boundary trade-offs explicitly ("Phase X is infrastructure-only; you won't be able to test feature Y until Phase X+1") instead of celebrating commit counts.
-- The user responds well to direct, honest assessment — not defensive progress framing.
+| Wave | Plan | Builds |
+|------|------|--------|
+| 1 | `03-01-PLAN.md` | `lib/graph/placement.ts` + `lib/graph/relations.ts` (with vitest), `addPerson` Server Action, SECURITY DEFINER RPC migration, `components/ui/Modal.tsx` |
+| 2 | `03-02-PLAN.md` | `RadialMenu.tsx` (NEW), optimistic add-relative pipeline in `tree-store.ts`, `+`-button wiring in `PersonNode.tsx`, side-panel auto-focus on add |
+| 3 | `03-03-PLAN.md` | zundo `temporal()` config (limit 100, partialize people-only), drag pause/resume bracket, `useSaveQueue.enqueueInverse`, `Toolbar.tsx` (NEW — 8 buttons with disabled states), generic `ToastHost.tsx` (NEW) |
+| 4 | `03-04-PLAN.md` | `useTreeKeyboard.ts` (NEW — scope-gated ⌘Z/⌘⇧Z/⌘Y/⌘K/⌘F), `SearchPalette.tsx` (NEW), inline-undo Delete refactor (replaces `window.confirm()`), a11y sweep (focus rings, ARIA, Tab order topbar→canvas→toolbar→side panel), Playwright `phase-3-demo-path.spec.ts` |
+
+The demo path Playwright E2E in Plan 04 Task 4 IS the success gate. Don't mark Phase 3 complete on type-check/build alone.
+
+## Decisions made this session
+
+1. **`addPerson` ships as a SECURITY DEFINER RPC** (not a two-write Server Action). Resolves CONTEXT.md D-09 atomicity + RESEARCH Q1.
+2. **Strictly sequential 4-wave structure.** Plans 02 and 03 share `tree-store.ts` and `PanZoomWrapper.tsx` in non-overlapping regions. Plan-checker iteration 1 caught the parallel-wave race; fix is structural via `depends_on`, not prose.
+3. **Modal small-viewport clamp implemented** (`clamp(20px, 15vh, 120px)`). Resolves RESEARCH Q4 inline rather than deferring.
+4. **Remove-person undo ships local-only.** Server-side `restorePerson` deferred to Phase 5 as T-03-23. TODO comment planted in `useHistoryReplay`'s 'gone now' branch + `Known Debt → Phase 5` SUMMARY entry in Plan 04.
+5. **Zero new npm packages.** Toast, search, modal, radial menu, keyboard layer all hand-rolled per UI-SPEC.
+
+Full handoff context (anti-patterns, infra state, decisions): `.planning/phases/03-authoring-history/.continue-here.md`
+Machine-readable: `.planning/HANDOFF.json`
+
+## Blocking constraint when resuming
+
+**Local supabase must be running before `/gsd-execute-phase 3` starts.** Plan 01 Task 2 runs `npx supabase db push` against the local instance. If supabase isn't up, Task 2 will fail mid-execute. Run `supabase status` first; `supabase start` if needed.
 
 ## Unfinished work (explicitly deferred, not forgotten)
 
-### Phase 2 code-review findings — `/gsd-code-review-fix 02` when ready
-`02-REVIEW.md` lists 6 warnings (0 critical). Most important:
-- **WR-01 (user-visible):** literal `\u2014` rendering as text in JSX children of `SidePanel.tsx`, `SavePill.tsx`, `SaveErrorToast.tsx`. Escapes in JS string contexts (object/array values) work — only the JSX text usages are broken.
-- **WR-02:** `SidePanel.handleRelationClick` Y-axis math adds TOPBAR_HEIGHT where it should subtract. "Center on this person" lands ~78px below screen center.
-- **WR-03:** `parseInt(v, 10)` on whitespace-only Born/Died input returns NaN → Zod rejects → error pill.
-- **WR-04:** `Math.min(...xs)` spread in EdgeLayer — fine at 200 nodes, harden before Phase 5.
-- **WR-05:** window mousemove/mouseup/wheel effects re-register every pan frame (deps on `transform.x/y/k`) — fix with imperative `storeApi.getState()` reads.
-- **WR-06:** toast dismissal reset key is `errorPersonId` (unchanged on re-error) — repeated failures for same person don't re-surface the toast.
+### Phase 2 HUMAN-UAT — 10 items in `.planning/phases/02-canvas-nodes-edit/02-HUMAN-UAT.md`
+All pending. Unlocks once Phase 3 ships radial-add and 2+ person trees are possible.
 
-### Phase 2 HUMAN-UAT — `.planning/phases/02-canvas-nodes-edit/02-HUMAN-UAT.md`
-10 items, all pending. Unlocks once Phase 3 ships radial-add and 2+ person trees are possible.
+### Phase 2 code-review fixes — `02-REVIEW.md` (6 warnings, 0 critical)
+Run `/gsd-code-review-fix 02` separately when ready. Do NOT mix with Phase 3 execution.
 
-### Next 16 deprecation warning — `middleware.ts` → `proxy.ts` rename
-Dev server logs `The "middleware" file convention is deprecated. Please use "proxy" instead.` Not in Phase 2 scope. Good candidate for a `/gsd-quick` or a Phase 5 infra plan.
+Top items:
+- WR-01: literal `—` rendering as text in JSX children of SidePanel/SavePill/SaveErrorToast.
+- WR-02: `SidePanel.handleRelationClick` Y-axis math sign error (~78px off-center).
+- WR-03: `parseInt(v, 10)` on whitespace-only Born/Died input → NaN → Zod rejects.
+- WR-05: window mousemove/mouseup/wheel effects re-register every pan frame.
 
-### Phase 3 pre-existing concerns (raise during `/gsd-discuss-phase 3`)
-- **zundo limit:** PROJECT.md says 50 past states. Confirm this is what the user wants, and whether drag mid-move should coalesce into one history entry.
-- **Cmd-Z inside inputs:** must be ignored when focus is in a text input or textarea (HIST-02 hint).
-- **Radial menu exact angles:** design handoff has a reference at `design_handoff_family_tree/`. Confirm pixel-parity targets.
-- **Delete confirmation UX:** Phase 2 uses `window.confirm()`. Phase 3 may want a styled modal or inline-undo.
-- **`+` button currently logs `[Phase 3] radial open for {id}`:** wire this up in Phase 3, don't remove the log without replacing the behavior.
-- **A11Y:** focus ring token, tab order (topbar → canvas → toolbar → side panel), ARIA labels on every interactive control (A11Y-01..03).
+### Next.js deprecation — `middleware.ts` → `proxy.ts` rename
+Dev server logs `The "middleware" file convention is deprecated. Please use "proxy" instead.` Good `/gsd-quick` candidate or Phase 5 infra plan.
 
-## Session commits (in order)
+### Phase 5 known debt
+- **T-03-23: server-side restorePerson Server Action.** When implemented, the inverse-Server-Action loop in Plan 03's `useHistoryReplay` 'gone now' branch will close. Source has a TODO comment referencing this handoff.
+
+## Session commits (this session — Phase 3 planning pipeline)
 
 ```
-abaff7c docs(quick-260422-9vu): fix Zustand selector + TreeSwitcher hang + hydratePeople reset
-0c9549c fix(quick-260422-9vu-03): reset selection/sidepanel/drag/save-status in hydratePeople
-340d786 fix(quick-260422-9vu-02): drop router.refresh() from TreeSwitcher handleCreate
-eb5ca59 fix(quick-260422-9vu-01): stabilise Zustand selectors to kill infinite render loop
-e712bd4 test(02): persist human verification items as UAT
-7ee1b8c docs(02): add code review report
-366639f docs(02-03): complete save-pipeline + side-panel plan
-52cba97 feat(02-03): SaveErrorToast + hoist useSaveQueue to canvas level
-58577a2 feat(02-03): SidePanel + SavePill + RelationsList + TreeCanvas mount
-535dc77 feat(02-03): field primitives (FieldInput + FieldTextarea + GenderSelect)
-3ddfc56 feat(02-03): useSaveQueue hook with per-person serial queue
-951bba7 docs(02-02): complete canvas-render plan
-3e7900c feat(02-02): PersonNode 180x76 card with all visual states
-718eab3 feat(02-02): PanZoomWrapper drag branches + movePerson persistence
-d1acc60 feat(02-02): EdgeLayer single-SVG overlay + AvatarCircle 40px
-d9f784d feat(02-02): TreeStoreProvider + TreeCanvas shell + PanZoomWrapper
-d101b7f docs(02-01): complete canvas-data-plumbing plan
-1bf7778 chore(02-01): Phase 2 CSS tokens + D-08 grooming
-7550bb5 feat(02-01): extend Zustand store with Phase 2 slice
-6d05521 feat(02-01): Server Actions for person mutations
-6aec2b6 feat(02-01): Zod person schema + pure graph utilities
-7415f7b test(02-01): add failing tests for edges + person schema
-61f97a1 docs(phase-02): commit Phase 2 plans before execution
+f82aa76 docs(03): create phase plan — 4 plans across 4 waves
+ff64c73 docs(03): research authoring & history domain
+31113a6 docs(state): record phase 3 context session
+903877b docs(03): capture phase context
+3f2b67e docs(03): mark UI-SPEC approved
+2a64f52 docs(03): UI-SPEC revision 1 — Typography 4 sizes / 2 weights + aria-label standardisation
+4f77050 docs(phase-3): UI design contract
 ```
 
-## Local dev environment reminder
+## Feedback to apply going forward (from prior sessions)
 
-- `.env.local` already has Clerk + Supabase keys set.
-- Supabase is a *remote* project — migrations at `supabase/migrations/20260421000000_initial_schema.sql` must be pushed via `npx supabase db push` (may need `npx supabase link --project-ref <ref>` first).
-- `npm run dev` starts Turbopack on port 3000. Dev indicator "rendering" persisting with a spinning cursor = likely a pending React 19 async transition (the bug that was fixed this session in TreeSwitcher; if it returns, look for another async `startTransition` with `router.refresh()` or similar).
-- macOS case-insensitive filesystem quirk: `/Users/davezabihaylo/Documents/ClaudeCode/czfamtree` (uppercase C) and `/Users/davezabihaylo/Documents/claudecode/czfamtree` (lowercase) resolve to the same directory. `Agent` worktree isolation fails under the uppercase variant — fall back to sequential execution if worktree creation errors out.
+The user values direct, honest assessment over defensive progress framing. Two rules to honor:
 
-## Don't do next session
-
-- Don't try to "finalize" Phase 2 by checking off HUMAN-UAT items until Phase 3 ships radial-add. You will be unable to create a multi-person tree to test with.
-- Don't auto-advance chains through `/gsd-ui-phase` → `/gsd-discuss-phase` → `/gsd-plan-phase`. TUI prompts break inside nested Task calls. Run them sequentially at the top level.
-- Don't fix the 6 code-review warnings in the same session as Phase 3 planning — they're polish, keep them separate. `/gsd-code-review-fix 02` is the right entry point when ready.
+1. **Measure "done" by what the user can actually do, not what tests pass.** A phase boundary that doesn't enable a usable user loop is a defect to flag *before* declaring completion. Phase 3's gate is the demo-path Playwright E2E specifically because Phase 2's gate was too lenient.
+2. **Name boundary trade-offs explicitly** ("X is shipped local-only, Y is deferred to Phase Z") instead of celebrating commit counts. T-03-23 is the live example of this in Phase 3.
